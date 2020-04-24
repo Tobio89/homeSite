@@ -1,12 +1,38 @@
 {% extends "base.html" %}
 
-{% block title %}{{ super() }}- Our Shopping List{% endblock %}
+{% block title %}{{ super() }} - What to buy{% endblock %}
+
+{% block subnav %}
+
+<div class="navbar-collapse collapse">
+    <ul class="nav navbar-nav">
+        <!-- To make sick stuff like dropdowns here we can't use li -->
+        <!-- Alternatively put a sub menu on each page -->
+        <li><a href="/shopping/add">Add</a></li>
+        <li><a href="/shopping/remove">Remove</a></li>
+
+
+    </ul>
+    
+</div>
+{% endblock %}
+
 
 {% block content %}
 <div class="page-header" style="padding-left: 50px;">
-    <h1>What do we need to buy?</h1>
+    <h1>You need to buy:</h1>
 </div>
 <div class="container">
-    <h3>More words go here</h3>
+    {% if items %}
+    <ul class="list-group">
+        {% for item in items %}
+            <li class="list-group-item">{{item}}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+        <div class="list-group-heading" style="padding-left: 50px;">
+            There's nothing you need to buy.
+        </div>
+    {% endif %}
 </div>
 {% endblock %}

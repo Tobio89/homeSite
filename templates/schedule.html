@@ -2,6 +2,19 @@
 
 {% block title %}{{ super() }}- Our Robinschedule{% endblock %}
 
+{% block subnav %}
+
+<div class="navbar-collapse collapse">
+    <ul class="nav navbar-nav">
+        <!-- To make sick stuff like dropdowns here we can't use li -->
+        <!-- Alternatively put a sub menu on each page -->
+        <li><a href="/shopping/add">Edit</a></li>
+
+    </ul>
+    
+</div>
+{% endblock %}
+
 {% block content %}
 <div class="page-header" style="padding-left: 50px;">
     <h1>Who's looking after Robin now?</h1>

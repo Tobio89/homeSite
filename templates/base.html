@@ -19,19 +19,20 @@
                 <!-- To make sick stuff like dropdowns here we can't use li -->
                 <!-- Alternatively put a sub menu on each page -->
                 <li><a href="/schedule">Robinschedule</a></li>
-                <li class="dropdown">
-                    <a href="/shopping" class="dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Shopping<span class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                      <li><a href="#">Add</a></li>
-                      <li><a href="#">Remove</a></li>
-                      <li><a href="#">View</a></li>
-                    </ul>
-                  </li>
+                <li><a href="/shopping">Shopping</a></li>
+
+       
             </ul>
+            
         </div>
+        {% block subnav %}
+        {% endblock %}
     </div>
 </div>
 {% endblock %}
+
+
+
 
 {% block content %}
 {% endblock %}

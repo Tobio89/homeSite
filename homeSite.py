@@ -20,6 +20,19 @@ bootstrap = Bootstrap(app)
 db = SQLAlchemy(app)
 
 
+# FORMS
+
+class ItemForm(FlaskForm):
+    item = StringField('Enter item:', validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
+class AddItemForm(FlaskForm):
+    item = StringField('Enter item:', validators=[DataRequired()])
+    quant = IntegerField('Enter quantity:',validators=[Optional()] )
+    submit = SubmitField('Submit')
+ 
+
+
 
 @app.route('/')
 def index():
@@ -33,5 +46,33 @@ def schedule():
 
 @app.route('/shopping')
 def shopping():
+    # shoppingItems = Grocery.query.all()
+    shoppingItems=['nought']
+    return render_template('shopping.html', items=shoppingItems)
+    
+@app.route('/shopping/add', methods=['GET', 'POST'])
+def shoppingAdd():
+    # shoppingItems = Grocery.query.all()
+    shoppingItems=['nought']
+    form = AddItemForm()
+    session['itemToAdd'] = form.item.data
+    session['itemQuantity'] = form.quant.data
+    if form.validate_on_submit():
+        newItem = session.get('itemToAdd')
+        
+        if session['itemQuantity'] and session['itemQuantity'] > 1:
+            # db.session.add(Grocery(itemName=newItem, quantity=session['itemQuantity']))
+            print('this happened')
+        else:
+            # db.session.add(Grocery(itemName=newItem))
+            print('that happened')
+        # db.session.commit()
 
-    return render_template('shopping.html')
+        return redirect(url_for('shoppingAdd'))
+
+    return render_template('add.html', form=form, items=shoppingItems)
+    
+@app.route('/shopping/remove')
+def shoppingRemove():
+
+    return render_template('remove.html')
