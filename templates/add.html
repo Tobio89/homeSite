@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+
+{% block title %}{{ super() }} - Add items to list{% endblock %}
+
+{% block subnav %}
+
+<div class="navbar-collapse collapse">
+    <ul class="nav navbar-nav">
+        <!-- To make sick stuff like dropdowns here we can't use li -->
+        <!-- Alternatively put a sub menu on each page -->
+        <li><a href="/shopping/add">Add</a></li>
+        <li><a href="/shopping/remove">Remove</a></li>
+
+
+    </ul>
+    
+</div>
+{% endblock %}
+
+
+{% block content %}
+<div class="page-header" style="padding-left: 50px;">
+    <h1>Add items</h1>
+</div>
+
+<div style="padding-left: 60px;">
+<h4>Current items on list:</h4>
+</div>
+
+<div class="container">
+    {% if items %}
+    <ul class="list-group">
+        {% for item in items %}
+            <li class="list-group-item">{{item}}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+        <div class="list-group-heading" style="padding-left: 50px;">
+            There's nothing on here yet.
+        </div>
+    {% endif %}
+</div>
+    <form class="form" method="post" role="form">
+        {{ form.hidden_tag() }}
+        {{ wtf.form_errors(form, hiddens="only") }}
+      <div style="width:400px; float:left; padding:0 20px 0 60px;">
+        {{ wtf.form_field(form.item) }}
+        
+    </div>
+    <div style="float:left; width:100px">
+        {{ wtf.form_field(form.quant) }}
+    </div>
+    <div style="padding:80px 20px 0 60px">
+        {{ wtf.form_field(form.submit) }}
+    </div>
+        
+
+      </form>
+<!-- {{ wtf.quick_form(form)}} -->
+{% endblock %}

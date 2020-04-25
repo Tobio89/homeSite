@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+
+{% block title %}{{ super() }} - Remove items from list{% endblock %}
+
+{% block content %}
+<div class="page-header" style="padding-left: 50px;">
+    <h1>Remove items</h1>
+</div>
+
+<div style="padding-left: 60px;">
+<h4>Current items on list:</h4>
+</div>
+
+<div class="container">
+    {% if items %}
+    <ul class="list-group">
+        {% for item in items %}
+            <li class="list-group-item">{{item}}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+        <div class="list-group-heading" style="padding-left: 50px;">
+            There's nothing on here yet.
+        </div>
+    {% endif %}
+    {% if fail %}
+    <div class="list-group-heading" style="padding-left: 50px;">
+        Could not find that item to remove.
+    </div>
+    {% endif %}
+
+</div>
+<form class="form" method="post" role="form">
+    {{ form.hidden_tag() }}
+    {{ wtf.form_errors(form, hiddens="only") }}
+  <div style="width:400px; float:left; padding:0 20px 0 60px;">
+    {{ wtf.form_field(form.item) }}
+    
+</div>
+
+<div style="padding:80px 20px 0 60px">
+    {{ wtf.form_field(form.submit) }}
+</div>
+    
+
+  </form>
+{% endblock %}
