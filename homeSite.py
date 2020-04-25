@@ -19,6 +19,25 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 bootstrap = Bootstrap(app)
 db = SQLAlchemy(app)
 
+# SQL DATABASE TABLES
+
+class Grocery(db.Model):
+    __tablename__ = 'groceries'
+    id = db.Column(db.Integer, primary_key=True)
+    itemName = db.Column(db.String(64), unique=True)
+    quantity = db.Column(db.Integer) #Setting quantity to optional so 'rice' doesn't need a quantity
+
+    def __repr__(self):
+        return f'<Grocery {self.itemName}>'
+
+    def __str__(self):
+        if self.quantity:
+            return f'{self.itemName} x {self.quantity}'
+        else:
+            return f'{self.itemName}'
+
+
+
 
 # FORMS
 
@@ -46,14 +65,14 @@ def schedule():
 
 @app.route('/shopping')
 def shopping():
-    # shoppingItems = Grocery.query.all()
-    shoppingItems=['nought']
+    shoppingItems = Grocery.query.all()
+    # shoppingItems=['nought']
     return render_template('shopping.html', items=shoppingItems)
     
 @app.route('/shopping/add', methods=['GET', 'POST'])
 def shoppingAdd():
-    # shoppingItems = Grocery.query.all()
-    shoppingItems=['nought']
+    shoppingItems = Grocery.query.all()
+    # shoppingItems=['nought']
     form = AddItemForm()
     session['itemToAdd'] = form.item.data
     session['itemQuantity'] = form.quant.data
@@ -61,18 +80,39 @@ def shoppingAdd():
         newItem = session.get('itemToAdd')
         
         if session['itemQuantity'] and session['itemQuantity'] > 1:
-            # db.session.add(Grocery(itemName=newItem, quantity=session['itemQuantity']))
-            print('this happened')
+            db.session.add(Grocery(itemName=newItem, quantity=session['itemQuantity']))
+            # print('this happened')
         else:
-            # db.session.add(Grocery(itemName=newItem))
-            print('that happened')
-        # db.session.commit()
+            db.session.add(Grocery(itemName=newItem))
+            # print('that happened')
+        db.session.commit()
 
         return redirect(url_for('shoppingAdd'))
 
     return render_template('add.html', form=form, items=shoppingItems)
     
-@app.route('/shopping/remove')
-def shoppingRemove():
+# @app.route('/shopping/remove')
+# def shoppingRemove():
 
-    return render_template('remove.html')
+#     return render_template('remove.html')
+
+
+@app.route('/shopping/remove', methods=['GET', 'POST'])
+def shoppingRemove(): #This name here is what 'url_for' is using.
+    shoppingItems = Grocery.query.all()
+    form = ItemForm()
+    session['itemToRemove'] = form.item.data
+    
+    if form.validate_on_submit():
+        removeItem = session.get('itemToRemove') # This comes from the class's variable name - look for %-%
+        itemToRemoveSQLQUERY = Grocery.query.filter_by(itemName=removeItem).first()
+        if itemToRemoveSQLQUERY:
+
+            db.session.delete(itemToRemoveSQLQUERY)
+            db.session.commit()
+            session['failState'] = False
+        else:
+            session['failState'] = True
+        # session['itemToAdd'] = form.itemToAdd.data
+        return redirect(url_for('shoppingRemove'))
+    return render_template('remove.html', form=form, items=shoppingItems, fail=session.get('failState', False))
