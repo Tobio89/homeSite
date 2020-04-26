@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template, session, redirect, url_for, request
+from flask import Flask, render_template, session, redirect, url_for, request, flash
 from flask_bootstrap import Bootstrap
 
 from flask_wtf import FlaskForm
@@ -57,8 +57,7 @@ class AddItemForm(FlaskForm):
 def index():
 
     # Clear the shopping states
-    session['removedItem'] = None
-    session['successState'] = False
+
     
     return render_template('index.html')
 
@@ -66,8 +65,7 @@ def index():
 def schedule():
 
     # Clear the shopping states
-    session['removedItem'] = None
-    session['successState'] = False
+
     
     return render_template('schedule.html')
 
@@ -75,8 +73,7 @@ def schedule():
 def shopping():
 
     # Clear the shopping states
-    session['removedItem'] = None
-    session['successState'] = False
+
 
     shoppingItems = Grocery.query.all()
     # shoppingItems=['nought']
@@ -86,8 +83,7 @@ def shopping():
 def shoppingAdd():
 
     # Clear the shopping states
-    session['removedItem'] = None
-    session['successState'] = False
+
 
     shoppingItems = Grocery.query.all()
     # shoppingItems=['nought']
@@ -135,20 +131,20 @@ def shoppingRemove(): #This name here is what 'url_for' is using.
 
                 db.session.delete(itemToRemoveSQLQUERY)            
                 session['failState'] = False
-                session['successState'] = True
+                
                  
             else:
                 session['failState'] = True
-                session['successState'] = False
+                
                 
         db.session.commit()
         if len(removeItems) > 1:
             itemString = ', '.join(removeItems)
-            session['removedItem'] = itemString
+            flash(f'The following items were removed: {itemString}')
         else:
-            session['removedItem'] = removeItems[0]
+            flash(f'The item: {removeItems[0]} was removed.')
         # session['itemToAdd'] = form.itemToAdd.data
         return redirect(url_for('shoppingRemove'))
 
 
-    return render_template('remove.html', items=shoppingItems, fail=session.get('failState', False), success=session.get('successState', False), removedItems=session.get('removedItem', False))
+    return render_template('remove.html', items=shoppingItems, fail=session.get('failState', False))

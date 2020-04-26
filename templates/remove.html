@@ -47,18 +47,28 @@
     <div class="list-group-heading" style="padding-left: 50px;">
         Could not find that item to remove.
     </div>
-    {% elif success %}
-        {% if removedItems %}
-            <div class="list-group-heading" style="padding-left: 50px;">
-                Successfully removed item(s): {{removedItems}}.
-            </div>
-        {% else %}
-            <div class="list-group-heading" style="padding-left: 50px;">
-                Successfully removed selected item(s).
-            </div>
-        {% endif %}
     {% endif %}
-    
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <!-- <ul class=flashes>
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul> -->
+            <p> <!--To drop the alert down a bit -->
+            <div class="alert alert-success" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                <strong>Success</strong>
+                {% for message in messages %}
+                <br>{{ message }}</br>
+                {% endfor %}
+                
+              </div>
+            </p>
+        {% endif %}
+    {% endwith %}
 
 </div>
 {% endblock %}
