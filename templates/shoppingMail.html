@@ -1,0 +1,10 @@
+
+Your Shopping List!
+
+{% if items %}
+{% for item in items %}
+{{ item }}
+{% endfor %}
+{% else %}
+There's nothing on the list to buy! Oops~
+{% endif %}

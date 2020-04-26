@@ -29,10 +29,36 @@
             <li class="list-group-item">{{item}}</li>
         {% endfor %}
     </ul>
+    <br/>
+    <form method="POST">
+        <ul style="list-style-type:none">
+            <li><input type='radio' name="emailRecipient" value="Toby"> Email list to Toby</input></li>
+            <li><input type='radio' name="emailRecipient" value="Eileen"> Email list to Eileen</input></li>
+        </ul>
+            <br />
+            <button type="submit" >Send!</button>
+    </form> 
     {% else %}
         <div class="list-group-heading" style="padding-left: 50px;">
             There's nothing you need to buy.
         </div>
     {% endif %}
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <p> <!--To drop the alert down a bit -->
+            <div class="alert alert-success" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                <strong>Success</strong>
+                {% for message in messages %}
+                <br>{{ message }}</br>
+                {% endfor %}
+                
+              </div>
+            </p>
+        {% endif %}
+    {% endwith %}
 </div>
 {% endblock %}

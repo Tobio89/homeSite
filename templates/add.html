@@ -28,6 +28,7 @@
 <div style="padding-left: 60px;">
 <h4>Current items on list:</h4>
 </div>
+<br />
 
 <div class="container">
     {% if items %}
@@ -38,20 +39,22 @@
     </ul>
     {% else %}
         <div class="list-group-heading" style="padding-left: 50px;">
-            There's nothing on here yet.
+            There's nothing on here. Add some items!
         </div>
     {% endif %}
 </div>
+<br />
     <form class="form" method="post" role="form">
         {{ form.hidden_tag() }}
         {{ wtf.form_errors(form, hiddens="only") }}
-      <div style="width:400px; float:left; padding:0 20px 0 60px;">
+      <div style="width:40%; float:left; padding:0 20px 0 60px;">
         {{ wtf.form_field(form.item) }}
         
     </div>
-    <div style="float:left; width:100px">
+    <div style="float:left; width:10%">
         {{ wtf.form_field(form.quant) }}
     </div>
+    <br />
     <div style="padding:80px 20px 0 60px">
         {{ wtf.form_field(form.submit) }}
     </div>

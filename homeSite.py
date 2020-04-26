@@ -1,23 +1,47 @@
 import os
 
 from flask import Flask, render_template, session, redirect, url_for, request, flash
-from flask_bootstrap import Bootstrap
 
+from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
+from flask_sqlalchemy import SQLAlchemy
+from flask_mail import Mail, Message
+
+
 from wtforms import StringField, SubmitField, IntegerField, RadioField
 from wtforms.validators import DataRequired, Optional
-from flask_sqlalchemy import SQLAlchemy
+
+import setENV
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'When in reme do as the remans do'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+
+# SQL APP CONFIGURATIONS
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# MAIL APP CONFIGURATIONS
 
+# The gmail settings are cut-and-paste
+app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+
+app.config['MAIL_SUBJECT_PREFIX'] = '[Homesite]'
+app.config['MAIL_SENDER'] = 'From homeSite <homesite1004@gmail.com>'
+
+
+
+# APP INITIALISATIONS
 bootstrap = Bootstrap(app)
 db = SQLAlchemy(app)
+mail = Mail(app)
+
+
 
 # SQL DATABASE TABLES
 
@@ -52,31 +76,55 @@ class AddItemForm(FlaskForm):
 
 
 
+# Functions
+
+def send_email(to, subject, template, **kwargs):
+    msg = Message(app.config['MAIL_SUBJECT_PREFIX'] + subject, sender=app.config['MAIL_SENDER'], recipients=[to])
+    msg.body = render_template(template + '.txt', **kwargs)
+    # msg.html = render_template(template + '.html', **kwargs)
+    mail.send(msg)
+
+
+
+
+# FLASK ROUTES / SITE PAGES
 
 @app.route('/')
 def index():
-
-    # Clear the shopping states
-
     
     return render_template('index.html')
 
 @app.route('/schedule')
 def schedule():
-
-    # Clear the shopping states
-
-    
+   
     return render_template('schedule.html')
 
-@app.route('/shopping')
+@app.route('/schedule/edit')
+def editSchedule():
+   
+    return render_template('editschedule.html')
+
+@app.route('/shopping', methods=['GET', 'POST'])
 def shopping():
-
-    # Clear the shopping states
-
-
+    
     shoppingItems = Grocery.query.all()
-    # shoppingItems=['nought']
+
+    recipientEmailAddress = None
+    if request.method == 'POST':
+        recipient = request.form.get('emailRecipient')
+        if recipient == 'Toby':
+            recipientEmailAddress = os.environ.get('TOBY_ADDRESS')
+        elif recipient == 'Eileen':
+            recipientEmailAddress = os.environ.get('EILEEN_ADDRESS')
+        
+        if recipientEmailAddress:
+            send_email(recipientEmailAddress, 'Your Shopping List', 'shoppingMail', items=shoppingItems)
+            print(f'Email sent to {recipientEmailAddress}')
+            flash(f'Your shopping list was mailed to {recipient}')
+        
+
+
+
     return render_template('shopping.html', items=shoppingItems)
     
 @app.route('/shopping/add', methods=['GET', 'POST'])
@@ -107,11 +155,6 @@ def shoppingAdd():
 
     return render_template('add.html', form=form, items=shoppingItems)
     
-# @app.route('/shopping/remove')
-# def shoppingRemove():
-
-#     return render_template('remove.html')
-
 
 @app.route('/shopping/remove', methods=['GET', 'POST'])
 def shoppingRemove(): #This name here is what 'url_for' is using.
