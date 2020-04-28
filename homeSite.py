@@ -60,7 +60,10 @@ class Grocery(db.Model):
         else:
             return f'{self.itemName}'
 
-
+class Schedule(db.Model): # This DB 'table' will only contain one cell. :D
+    __tablename__ = 'schedule'
+    id = db.Column(db.Integer, primary_key=True)
+    stringSchedule = db.Column(db.String(64))
 
 
 # FORMS
@@ -84,9 +87,6 @@ def send_email(to, subject, template, **kwargs):
     # msg.html = render_template(template + '.html', **kwargs)
     mail.send(msg)
 
-
-scheduleString = 'EEEEEEEETTTTTBEETTTEEBTT'
-scheduleList = [letter for letter in scheduleString]
 timeList = [f'{num}:00' for num in range(0, 24)]
 
 
@@ -99,16 +99,41 @@ def index():
 
 @app.route('/schedule')
 def schedule():
+
+    scheduleString = Schedule.query.first().stringSchedule
+    scheduleList = [letter for letter in scheduleString]
+    
    
     return render_template('schedule.html', timeTitle=timeList, schedule=scheduleList)
 
-@app.route('/schedule/edit')
+@app.route('/schedule/edit', methods=['GET', 'POST'])
 def editSchedule():
+
+    scheduleString = Schedule.query.first().stringSchedule
+    scheduleList = [letter for letter in scheduleString]
+
+    if request.method == 'POST':
+        print('Schedule edit request')
+        newSchedule = request.form.getlist('newSchedule')
+        newSchedule_joined = ''.join(newSchedule)
+
+        if newSchedule == scheduleList:
+            print('Schedule is the same - no change made')
+            flash(f' No changes detected')
+
+        else:
+            schedule_loaded_from_database = Schedule.query.first()
+            schedule_loaded_from_database.stringSchedule = newSchedule_joined
+            db.session.commit()
+            print(f'Edited to: {newSchedule_joined}')
+            return redirect(url_for('schedule'))
+
    
     return render_template('editschedule.html', timeTitle=timeList, schedule=scheduleList)
 
 @app.route('/shopping', methods=['GET', 'POST'])
 def shopping():
+    
     
     shoppingItems = Grocery.query.all()
 
@@ -133,11 +158,8 @@ def shopping():
 @app.route('/shopping/add', methods=['GET', 'POST'])
 def shoppingAdd():
 
-    # Clear the shopping states
-
-
     shoppingItems = Grocery.query.all()
-    # shoppingItems=['nought']
+
     form = AddItemForm()
     session['itemToAdd'] = form.item.data
     session['itemQuantity'] = form.quant.data
@@ -148,10 +170,10 @@ def shoppingAdd():
         
         if session['itemQuantity'] and session['itemQuantity'] > 1:
             db.session.add(Grocery(itemName=newItem, quantity=session['itemQuantity']))
-            # print('this happened')
+
         else:
             db.session.add(Grocery(itemName=newItem))
-            # print('that happened')
+
         db.session.commit()
 
         return redirect(url_for('shoppingAdd'))
@@ -163,13 +185,11 @@ def shoppingAdd():
 def shoppingRemove(): #This name here is what 'url_for' is using.
 
     shoppingItems = Grocery.query.all()
-    # form = ItemForm()
-    # session['itemToRemove'] = form.item.data
+
     
     if request.method == 'POST':
         removeItems = request.form.getlist('removeItem')
 
-        # removeItems = session.get('itemToRemove') # This comes from the class's variable name - look for %-%
         for item in removeItems:
             print(f'Remove: {item}')
             itemToRemoveSQLQUERY = Grocery.query.filter_by(itemName=item).first()
@@ -189,7 +209,7 @@ def shoppingRemove(): #This name here is what 'url_for' is using.
             flash(f'The following items were removed: {itemString}')
         else:
             flash(f'The item: {removeItems[0]} was removed.')
-        # session['itemToAdd'] = form.itemToAdd.data
+
         return redirect(url_for('shoppingRemove'))
 
 
