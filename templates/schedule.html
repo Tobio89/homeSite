@@ -20,6 +20,29 @@
     <h1>Who's looking after Robin now?</h1>
 </div>
 <div class="container">
-    <h3>More words go here</h3>
+    <table class="table" style="width:80%; border-spacing:5px; border:1px solid black">
+        <tr>
+            {% for timeHeading in timeTitle %}
+            <th style="text-align:center; border-spacing:5px; border:1px solid black">{{timeHeading}}</th>
+            {% endfor %}
+        </tr>
+        <tr>
+            {% for scheduleCell in schedule %}
+                {% if scheduleCell == 'E' %} 
+                <td style="background-color:gold; text-align:center; border-spacing:5px; border:1px solid black">
+                    {{scheduleCell}}
+                </td>
+                {% elif scheduleCell == 'T' %}
+                <td style="background-color:mediumslateblue; text-align:center; border-spacing:5px; border:1px solid black">
+                    {{scheduleCell}}
+                </td>
+                {% else %}
+                <td style="background-color:mediumseagreen; text-align:center; border-spacing:5px; border:1px solid black">
+                    {{scheduleCell}}
+                </td>
+                {% endif %}
+            {% endfor %}
+        </tr>
+    </table>
 </div>
 {% endblock %}

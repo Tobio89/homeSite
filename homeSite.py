@@ -85,6 +85,9 @@ def send_email(to, subject, template, **kwargs):
     mail.send(msg)
 
 
+scheduleString = 'EEEEEEEETTTTTBEETTTEEBTT'
+scheduleList = [letter for letter in scheduleString]
+timeList = [f'{num}:00' for num in range(0, 24)]
 
 
 # FLASK ROUTES / SITE PAGES
@@ -97,12 +100,12 @@ def index():
 @app.route('/schedule')
 def schedule():
    
-    return render_template('schedule.html')
+    return render_template('schedule.html', timeTitle=timeList, schedule=scheduleList)
 
 @app.route('/schedule/edit')
 def editSchedule():
    
-    return render_template('editschedule.html')
+    return render_template('editschedule.html', timeTitle=timeList, schedule=scheduleList)
 
 @app.route('/shopping', methods=['GET', 'POST'])
 def shopping():
@@ -191,3 +194,4 @@ def shoppingRemove(): #This name here is what 'url_for' is using.
 
 
     return render_template('remove.html', items=shoppingItems, fail=session.get('failState', False))
+
