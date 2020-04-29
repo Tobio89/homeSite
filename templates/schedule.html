@@ -24,26 +24,8 @@
 <div class="page-header" style="padding-left: 50px;">
     <h1>Who's looking after Robin now?</h1>
 </div>
-<div class="container">
+<div class="container-fluid">
     <style>
-        .schedtable {
-        height: 100px;
-        width: 100%;
-        /* border-spacing: collapse; */
-        border: 2px solid black;
-
-    }
-    th{
-        text-align: center;
-        border: 2px solid black;
-        width:4%;
-    }
-    td {
-        padding: 0;
-        text-align: center;
-        border: 2px solid black;
-        width:4%;
-    }
     .current{
        border: 4px solid red; 
     }
@@ -57,16 +39,9 @@
     .both{
         background-color: mediumseagreen;
     }
-
-
-    @media screen and (max-width: 500px) {
-        table th tr td :nth-child(n+9):nth-child(n+11){
-            display: inline-block;
-        }
-    
-    }
     </style>
-    <table class="schedtable">
+    <div class="table-responsive" style="overflow-x: auto;">
+    <table class="table schedtable">
         <tr>
             {% for timeHeading in timeTitle %}
                 {% if timeHeading == currentHour %}
@@ -101,6 +76,7 @@
             {% endfor %}
         </tr>
     </table>
+    </div>
 </div>
 {% endblock %}
 
