@@ -91,7 +91,7 @@ def send_email(to, subject, template, **kwargs):
 timeList = [f'{num}' for num in range(0, 24)]
 
 def getWisdom():
-    wisPath = r'.\wisdomSlices'
+    wisPath = './wisdomSlices'
     pearls = [txtFile for txtFile in os.listdir(wisPath) if txtFile.endswith('.txt')]
     randomPearl = random.choice(pearls)
 
