@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 from flask import Flask, render_template, session, redirect, url_for, request, flash
 
@@ -40,7 +41,7 @@ app.config['MAIL_SENDER'] = 'From homeSite <homesite1004@gmail.com>'
 bootstrap = Bootstrap(app)
 db = SQLAlchemy(app)
 mail = Mail(app)
-
+# moment = Moment(app)
 
 
 # SQL DATABASE TABLES
@@ -87,7 +88,7 @@ def send_email(to, subject, template, **kwargs):
     # msg.html = render_template(template + '.html', **kwargs)
     mail.send(msg)
 
-timeList = [f'{num}:00' for num in range(0, 24)]
+timeList = [f'{num}' for num in range(0, 24)]
 
 
 # FLASK ROUTES / SITE PAGES
@@ -102,9 +103,11 @@ def schedule():
 
     scheduleString = Schedule.query.first().stringSchedule
     scheduleList = [letter for letter in scheduleString]
+
+    currentHour = datetime.now().hour
     
    
-    return render_template('schedule.html', timeTitle=timeList, schedule=scheduleList)
+    return render_template('schedule.html', timeTitle=timeList, schedule=scheduleList, currentHour=str(currentHour))
 
 @app.route('/schedule/edit', methods=['GET', 'POST'])
 def editSchedule():

@@ -23,8 +23,15 @@
     <table class="table" style="width:80%; border-spacing:5px; border:1px solid black">
         <tr>
             {% for timeHeading in timeTitle %}
-            <th style="text-align:center; border-spacing:5px; border:1px solid black">{{timeHeading}}</th>
+                <th style="text-align:center; border-spacing:5px; border:1px solid black">
+                {% if timeHeading == currentHour %}
+                    <div style="font-weight:bolder">{{timeHeading}}:00</div>
+                {% else %}
+                    {{timeHeading}}:00
+                {% endif %}
+                </th>
             {% endfor %}
+
         </tr>
         <tr>
             {% for scheduleCell in schedule %}
