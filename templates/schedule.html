@@ -1,8 +1,13 @@
 {% extends "base.html" %}
 
+
+
+
 {% block title %}{{ super() }}Our Robinschedule{% endblock %}
 
 {% block subnav %}
+
+
 
 <div class="navbar-collapse collapse">
     <ul class="nav navbar-nav">
@@ -20,31 +25,76 @@
     <h1>Who's looking after Robin now?</h1>
 </div>
 <div class="container">
-    <table class="table" style="width:80%; border-spacing:5px; border:1px solid black">
+    <style>
+        .schedtable {
+        height: 100px;
+        width: 100%;
+        /* border-spacing: collapse; */
+        border: 2px solid black;
+
+    }
+    th{
+        text-align: center;
+        border: 2px solid black;
+        width:4%;
+    }
+    td {
+        padding: 0;
+        text-align: center;
+        border: 2px solid black;
+        width:4%;
+    }
+    .current{
+       border: 4px solid red; 
+    }
+    .eileen{
+        background-color: gold;
+    }
+    .toby{
+        background-color: mediumslateblue;
+    }
+
+    .both{
+        background-color: mediumseagreen;
+    }
+
+
+    @media screen and (max-width: 500px) {
+        table th tr td :nth-child(n+9):nth-child(n+11){
+            display: inline-block;
+        }
+    
+    }
+    </style>
+    <table class="schedtable">
         <tr>
             {% for timeHeading in timeTitle %}
-                <th style="text-align:center; border-spacing:5px; border:1px solid black">
                 {% if timeHeading == currentHour %}
+                <th class="current">
                     <div style="font-weight:bolder">{{timeHeading}}:00</div>
-                {% else %}
-                    {{timeHeading}}:00
-                {% endif %}
                 </th>
+                {% else %}
+                <th>
+                    {{timeHeading}}:00
+                </th>
+
+                {% endif %}
+                
             {% endfor %}
 
         </tr>
         <tr>
             {% for scheduleCell in schedule %}
                 {% if scheduleCell == 'E' %} 
-                <td style="background-color:gold; text-align:center; border-spacing:5px; border:1px solid black">
+                <td class="eileen">
                     {{scheduleCell}}
                 </td>
                 {% elif scheduleCell == 'T' %}
-                <td style="background-color:mediumslateblue; text-align:center; border-spacing:5px; border:1px solid black">
+                <td class="toby">
                     {{scheduleCell}}
                 </td>
                 {% else %}
-                <td style="background-color:mediumseagreen; text-align:center; border-spacing:5px; border:1px solid black">
+                <td class="both">
                     {{scheduleCell}}
                 </td>
                 {% endif %}
@@ -53,3 +103,11 @@
     </table>
 </div>
 {% endblock %}
+
+<!--"background-color:mediumseagreen; text-align:center; border-spacing:5px; border:1px solid black"  -->
+
+<!-- "background-color:mediumslateblue; text-align:center; border-spacing:5px; border:1px solid black" -->
+
+<!-- "background-color:gold; text-align:center; border-spacing:5px; border:1px solid black" -->
+
+<!-- "text-align:center; border-spacing:5px; border:1px solid black" -->

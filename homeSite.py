@@ -1,4 +1,4 @@
-import os
+import os, random
 from datetime import datetime
 
 from flask import Flask, render_template, session, redirect, url_for, request, flash
@@ -90,13 +90,22 @@ def send_email(to, subject, template, **kwargs):
 
 timeList = [f'{num}' for num in range(0, 24)]
 
+def getWisdom():
+    wisPath = r'.\wisdomSlices'
+    pearls = [txtFile for txtFile in os.listdir(wisPath) if txtFile.endswith('.txt')]
+    randomPearl = random.choice(pearls)
+
+    with open(os.path.join(wisPath, randomPearl),  'r') as pearlFile:
+        pearlText = pearlFile.read()
+    return pearlText
+
 
 # FLASK ROUTES / SITE PAGES
 
 @app.route('/')
 def index():
-    
-    return render_template('index.html')
+    content = getWisdom()
+    return render_template('index.html', textContent=content)
 
 @app.route('/schedule')
 def schedule():
