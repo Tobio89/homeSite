@@ -124,6 +124,8 @@ def editSchedule():
     scheduleString = Schedule.query.first().stringSchedule
     scheduleList = [letter for letter in scheduleString]
 
+    # tableList = zip(timeList, scheduleList)
+
     if request.method == 'POST':
         print('Schedule edit request')
         newSchedule = request.form.getlist('newSchedule')
@@ -141,7 +143,7 @@ def editSchedule():
             return redirect(url_for('schedule'))
 
    
-    return render_template('editschedule.html', timeTitle=timeList, schedule=scheduleList)
+    return render_template('editschedule.html', timeTitle=timeList, schedule=scheduleList,)
 
 @app.route('/shopping', methods=['GET', 'POST'])
 def shopping():

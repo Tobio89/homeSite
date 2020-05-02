@@ -27,7 +27,11 @@
 <div class="container-fluid">
     <style>
     .current{
-       border: 4px solid red; 
+       /* border: 2px solid red; */
+       scroll-snap-align: center;
+       -webkit-box-shadow:inset 0px 0px 0px 4px #f00;
+       -moz-box-shadow:inset 0px 0px 0px 4px #f00;
+       box-shadow:inset 0px 0px 0px 4px #f00; 
     }
     .eileen{
         background-color: gold;
@@ -38,6 +42,9 @@
 
     .both{
         background-color: mediumseagreen;
+    }
+    td{
+        text-align:center
     }
     </style>
     <div class="table-responsive" style="overflow-x: auto;">
@@ -77,13 +84,6 @@
         </tr>
     </table>
     </div>
-</div>
+    
+   
 {% endblock %}
-
-<!--"background-color:mediumseagreen; text-align:center; border-spacing:5px; border:1px solid black"  -->
-
-<!-- "background-color:mediumslateblue; text-align:center; border-spacing:5px; border:1px solid black" -->
-
-<!-- "background-color:gold; text-align:center; border-spacing:5px; border:1px solid black" -->
-
-<!-- "text-align:center; border-spacing:5px; border:1px solid black" -->
