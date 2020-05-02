@@ -28,7 +28,6 @@
     <style>
     .current{
        /* border: 2px solid red; */
-       scroll-snap-align: center;
        -webkit-box-shadow:inset 0px 0px 0px 4px #f00;
        -moz-box-shadow:inset 0px 0px 0px 4px #f00;
        box-shadow:inset 0px 0px 0px 4px #f00; 
@@ -46,14 +45,19 @@
     td{
         text-align:center
     }
+    #currentCell{
+        font-weight:bolder;
+    }
     </style>
+ 
     <div class="table-responsive" style="overflow-x: auto;">
+        
     <table class="table schedtable">
         <tr>
             {% for timeHeading in timeTitle %}
                 {% if timeHeading == currentHour %}
                 <th class="current">
-                    <div style="font-weight:bolder">{{timeHeading}}:00</div>
+                    <div id="currentCell">{{timeHeading}}:00</div>
                 </th>
                 {% else %}
                 <th>
@@ -83,7 +87,23 @@
             {% endfor %}
         </tr>
     </table>
+    <!-- Script to make table scroll to current cell, if scroll bar -->
+    <script>
+        const currentCellLoc = document.getElementById('currentCell');
+        currentCellLoc.scrollIntoView(true);
+    </script>
     </div>
-    
    
+  
 {% endblock %}
+<script>
+    const julie = document.getElementById('currentCell');
+    if (julie) {
+        document.write('crap');
+    } else {
+        document.write('fuck');
+    }
+
+    julie.scrollIntoView();
+    document.write('BALLS')
+</script>
