@@ -12,6 +12,8 @@ from flask_migrate import Migrate
 from wtforms import StringField, SubmitField, IntegerField, RadioField
 from wtforms.validators import DataRequired, Optional
 
+from parcelChecker import getCJParcelStatus, getHanjinParcelStatus, getLotteParcelStatus
+
 import setENV
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -66,6 +68,18 @@ class Schedule(db.Model): # This DB 'table' will only contain one cell. :D
     __tablename__ = 'schedule'
     id = db.Column(db.Integer, primary_key=True)
     stringSchedule = db.Column(db.String(64))
+
+class ParcelInfo(db.Model): # Store Parcel Information
+    __tablename__ = 'parcelInfo'
+    id = db.Column(db.Integer, primary_key=True)
+    trackingNumber = db.Column(db.String(64))
+    company = db.Column(db.String(64))
+    delivered = db.Column(db.Boolean()) #Store simple bool for is delivered - use for CSS styling
+    status = db.Column(db.String(64)) #Store short parcel status note
+    timestamp = db.Column(db.DateTime()) #Store last update's timestamp
+    location = db.Column(db.String(64)) #Store last update's location 
+    extraNotes = db.Column(db.String(64)) #Store extra notes if given
+
 
 
 # FORMS
