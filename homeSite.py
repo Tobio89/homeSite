@@ -230,3 +230,8 @@ def shoppingRemove(): #This name here is what 'url_for' is using.
 
     return render_template('remove.html', items=shoppingItems, fail=session.get('failState', False))
 
+
+@app.route('/shipping')
+def shipping():
+
+    return render_template('shipping.html')
