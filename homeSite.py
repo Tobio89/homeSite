@@ -7,7 +7,7 @@ from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
-
+from flask_migrate import Migrate
 
 from wtforms import StringField, SubmitField, IntegerField, RadioField
 from wtforms.validators import DataRequired, Optional
@@ -41,6 +41,7 @@ app.config['MAIL_SENDER'] = 'From homeSite <homesite1004@gmail.com>'
 bootstrap = Bootstrap(app)
 db = SQLAlchemy(app)
 mail = Mail(app)
+migrate = Migrate(app, db)
 # moment = Moment(app)
 
 
