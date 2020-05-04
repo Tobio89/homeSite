@@ -1,6 +1,7 @@
 import bs4, requests
 from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
+# from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -10,7 +11,7 @@ from datetime import datetime
 # from selenium.webdriver.support.ui import Select
 
 # BS4headers = {'User-Agent' : 'Chrome/70.0.3538.77'}
-
+# driver = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver')
 
 CJParcelNumber = '630200846612'
 def getCJParcelStatus(parcelNumber):
@@ -19,8 +20,10 @@ def getCJParcelStatus(parcelNumber):
     
 
     options = Options()
+    options.add_argument("--headless")
     options.headless = True # This option is used to show or hide the browser window whilst working.
-    driver = webdriver.Firefox(options=options)
+    # driver = webdriver.Firefox(options=options)
+    driver = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver', options=options)
     driver.get(CJTEKBAEurl)
     if options.headless == True:
         print ("Headless Firefox Initialized")
@@ -76,7 +79,8 @@ def getLotteParcelStatus(parcelNumber):
 
     options = Options()
     options.headless = True # This option is used to show or hide the browser window whilst working.
-    driver = webdriver.Firefox(options=options)
+    # driver = webdriver.Firefox(options=options)
+    driver = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver')
     driver.get(LotteTekbaeUrl)
     if options.headless == True:
         print ("Headless Firefox Initialized")
