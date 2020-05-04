@@ -74,7 +74,8 @@ class ParcelInfo(db.Model): # Store Parcel Information
     id = db.Column(db.Integer, primary_key=True)
     trackingNumber = db.Column(db.String(64))
     company = db.Column(db.String(64))
-    delivered = db.Column(db.Boolean()) #Store simple bool for is delivered - use for CSS styling
+    description = db.Column(db.String(64))
+    delivered = db.Column(db.Boolean(), default=False) #Store simple bool for is delivered - use for CSS styling
     status = db.Column(db.String(64)) #Store short parcel status note
     timestamp = db.Column(db.DateTime()) #Store last update's timestamp
     location = db.Column(db.String(64)) #Store last update's location 
@@ -103,8 +104,6 @@ def send_email(to, subject, template, **kwargs):
     # msg.html = render_template(template + '.html', **kwargs)
     mail.send(msg)
 
-timeList = [f'{num}' for num in range(0, 24)]
-
 def getWisdom():
     wisPath = './wisdomSlices'
     pearls = [txtFile for txtFile in os.listdir(wisPath) if txtFile.endswith('.txt')]
@@ -113,6 +112,11 @@ def getWisdom():
     with open(os.path.join(wisPath, randomPearl),  'r') as pearlFile:
         pearlText = pearlFile.read()
     return pearlText
+
+# Constant Variables
+
+timeList = [f'{num}' for num in range(0, 24)]
+parcelProviders = ['HanJin', 'CJ', 'Lotte']
 
 
 # FLASK ROUTES / SITE PAGES
@@ -245,7 +249,20 @@ def shoppingRemove(): #This name here is what 'url_for' is using.
     return render_template('remove.html', items=shoppingItems, fail=session.get('failState', False))
 
 
-@app.route('/shipping')
+@app.route('/shipping', methods=['GET', 'POST'])
 def shipping():
 
-    return render_template('shipping.html')
+    parcelsCurrentlyTracked = ParcelInfo.query.all()
+
+    if request.method == 'POST':
+        newItem_deliveryCompany = request.form.get('selectedParcelProvider')
+        newItem_parcelNumber = request.form.get('parcelNumber')
+        newItem_description = request.form.get('parcelDescription')
+
+        db.session.add(ParcelInfo(trackingNumber=newItem_parcelNumber, company=newItem_deliveryCompany, description=newItem_description, delivered=False))
+
+        print(f"Add parcel {newItem_parcelNumber} delivered by {newItem_deliveryCompany}. It's a {newItem_description}")
+        db.session.commit()
+        
+
+    return render_template('shipping.html', companies=parcelProviders, parcels=parcelsCurrentlyTracked)

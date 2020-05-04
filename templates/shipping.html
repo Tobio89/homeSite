@@ -6,9 +6,53 @@
 <div class="page-header" style="padding-left: 50px;">
     <h1>Parcel Tracking</h1>
 </div>
+{% if parcels %}
+
 <div class="container">
+    <table class="table">
+        <th>Item:</th>
+        <th>Company:</th>
+        <th>Tracking Number:</th>
+        <th>Timestamp:</th>
+        <th>Status:</th>
+        <th>Location:</th>
+        <th>Extra:</th>
+        {% for parcel in parcels %}
+        <tr>
+            <td>{{parcel.description}}</td>
+            <td>{{parcel.company}}</td>
+            <td>{{parcel.trackingNumber}}</td>
+            <td>{{parcel.timestamp}}</td>
+            <td>{{parcel.status}}</td>
+            <td>{{parcel.location}}</td>
+            <td>{{parcel.extraNotes}}</td>
+        </tr>  
+        {% endfor %}
 
-    <h4>Nothing, yet.</h4>
-
+    </table>
 </div>
+{% endif %}
+<div class="container" style="border: 1px solid black; padding: 10px;">
+    <h4>Add Parcels:</h4>
+    <form method=POST> <!-- Form for selecting the parcel provider -->
+        <label for="selectedParcelProvider">Delivery Company:</label>
+        <select id="selectedParcelProvider" name="selectedParcelProvider">
+            {% for company in companies %}
+                <option value="{{company}}">{{company}}</option>
+            {% endfor %}
+        </select>
+        <br/>
+        <label for="parcelNumber">Parcel Number:</label>
+        <input type="text" id="parcelNumber" name="parcelNumber" required>
+        <br/>
+        <br/>
+        <label for="parcelDescription">Description:</label>
+        <input type="text" id="parcelDescription" name="parcelDescription" required>
+        <br/>
+        <br/>
+        <input type="submit">
+    </form>
+</div>
+
+
 {% endblock %}
