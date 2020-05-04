@@ -5,6 +5,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+
+from datetime import datetime
 # from selenium.webdriver.support.ui import Select
 
 # BS4headers = {'User-Agent' : 'Chrome/70.0.3538.77'}
@@ -35,7 +37,7 @@ def getCJParcelStatus(parcelNumber):
 
     CJParcelTable = element.get_attribute('innerHTML')
 
-    CJSoup = bs4.BeautifulSoup(CJParcelTable, features='lxml')
+    CJSoup = bs4.BeautifulSoup(CJParcelTable, features="html.parser")
 
     driver.quit()
 
@@ -43,17 +45,22 @@ def getCJParcelStatus(parcelNumber):
     CJParcelCells = CJParcelTable_BottomRow.findAll('td')
 
     results = [cell.get_text() for cell in CJParcelCells]
-    print(results)
 
     # for result in results:
     #     print(result)
     try:
+        datetimeObj = None
+        try:
+            datetimeObj = datetime.strptime(results[1], "%Y-%m-%d %H:%M:%S.%f")
+        except:
+            print(f'CJ Tracking produced erroneous datetime: {results[1]}')
+
         resultsDict = {
-        'status' : results[0],
-        'dateTime' : results[1],
-        'location' : results[3],
-        'extra': results[2]
-    }
+                        'status' : results[0],
+                        'dateTime' : datetimeObj,
+                        'location' : results[3],
+                        'extra': results[2]
+                        }
         return resultsDict
     except:
         print('Failed to extract data. Data gathered:')
@@ -92,16 +99,33 @@ def getLotteParcelStatus(parcelNumber):
     LotteParcelTable = element.get_attribute('innerHTML')
 
 
-    LotteSoup = bs4.BeautifulSoup(LotteParcelTable, features='lxml')
+    LotteSoup = bs4.BeautifulSoup(LotteParcelTable, features="html.parser")
     driver.quit()
     LotteParcelTable_BottomRow = LotteSoup.findAll('tr')[-1]
     LotteParcelCells = LotteParcelTable_BottomRow.findAll('td')
 
     results = [cell.get_text() for cell in LotteParcelCells]
+    strippedDateCell = results[1].strip()
     try:
+        datetimeObj = None
+        try:
+
+            if strippedDateCell.endswith('\xa0--:--'):
+                timeLessDate = results[1].strip()[:-6]
+                datetimeObj = datetime.strptime(timeLessDate, "%Y-%m-%d")
+            else:
+                try:
+                    datetimeObj = datetime.strptime(strippedDateCell, "%Y-%m-%d %H:%M:%S.%f")
+                except:
+                    print(f'Lotte Tracking produced erroneous datetime: {strippedDateCell}')
+
+        except:
+            print(f'Lotte Tracking produced erroneous datetime: {strippedDateCell}')
+
+
         resultsDict = {
             'status' : results[0],
-            'dateTime' : results[1].strip(),
+            'dateTime' : datetimeObj,
             'location' : results[2].strip(),
             'extra': results[3]
         }
@@ -112,7 +136,8 @@ def getLotteParcelStatus(parcelNumber):
             return {
                 'status' : results[0],
                 'dateTime': 'Expired',
-                'location' : 'Expired'
+                'location' : 'Expired',
+                'extra': 'Expired'
             }
         else:
             print('Failed to extract data. Data gathered:')
@@ -132,7 +157,7 @@ def getHanjinParcelStatus(parcelNumber):
 
     res.raise_for_status()
 
-    resultsPageSOUP = bs4.BeautifulSoup(res.text, features='lxml')
+    resultsPageSOUP = bs4.BeautifulSoup(res.text, features="html.parser")
 
     resultsTable_entire = resultsPageSOUP.findAll('tbody')[1] #Table 1 is some sort of invoice for the parcel service.
 
@@ -152,8 +177,14 @@ def getHanjinParcelStatus(parcelNumber):
     results.extend(splitFinalCell) # Add usable data from final cell.
 
     try:
+        datetimeObj = None
+        try:
+            datetimeObj = datetime.strptime(f'{results[0]} {results[1]}', "%Y-%m-%d %H:%M")
+        except:
+            print(f'HanJin Tracking produced erroneous datetime: {results[0]} {results[1]}')
+
         resultsDict = {
-            'dateTime' : f'{results[0]} {results[1]}',
+            'dateTime' : datetimeObj,
             'location' : results[2],
             'status' : results[3],
             'extra' : results[4]
