@@ -9,7 +9,9 @@
 {% if parcels %}
 
 <div class="container">
+    <form method="POST"><!--Form to control fetching parcel results-->
     <table class="table">
+        
         <th>Item:</th>
         <th>Company:</th>
         <th>Tracking Number:</th>
@@ -17,6 +19,7 @@
         <th>Status:</th>
         <th>Location:</th>
         <th>Extra:</th>
+        <th></th>
         {% for parcel in parcels %}
         <tr>
             <td>{{parcel.description}}</td>
@@ -26,15 +29,20 @@
             <td>{{parcel.status}}</td>
             <td>{{parcel.location}}</td>
             <td>{{parcel.extraNotes}}</td>
+            <td><input type="radio" name="parcelToCheck" value="{{parcel.id}}"></td>
         </tr>  
         {% endfor %}
+        
 
     </table>
+    <input type="submit" name="parcelToCheck" value="Get Tracking Information">
+    </form>
+<br/>
 </div>
 {% endif %}
 <div class="container" style="border: 1px solid black; padding: 10px;">
     <h4>Add Parcels:</h4>
-    <form method=POST> <!-- Form for selecting the parcel provider -->
+    <form method=POST name="addParcelInfo"> <!-- Form for selecting the parcel provider -->
         <label for="selectedParcelProvider">Delivery Company:</label>
         <select id="selectedParcelProvider" name="selectedParcelProvider">
             {% for company in companies %}
@@ -50,7 +58,7 @@
         <input type="text" id="parcelDescription" name="parcelDescription" required>
         <br/>
         <br/>
-        <input type="submit">
+        <input type="submit" name="addParcelInfo">
     </form>
 </div>
 

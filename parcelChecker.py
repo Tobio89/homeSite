@@ -37,7 +37,7 @@ def getCJParcelStatus(parcelNumber):
 
     CJParcelTable = element.get_attribute('innerHTML')
 
-    CJSoup = bs4.BeautifulSoup(CJParcelTable, features='lxml')
+    CJSoup = bs4.BeautifulSoup(CJParcelTable, features="html.parser")
 
     driver.quit()
 
@@ -99,7 +99,7 @@ def getLotteParcelStatus(parcelNumber):
     LotteParcelTable = element.get_attribute('innerHTML')
 
 
-    LotteSoup = bs4.BeautifulSoup(LotteParcelTable, features='lxml')
+    LotteSoup = bs4.BeautifulSoup(LotteParcelTable, features="html.parser")
     driver.quit()
     LotteParcelTable_BottomRow = LotteSoup.findAll('tr')[-1]
     LotteParcelCells = LotteParcelTable_BottomRow.findAll('td')
@@ -116,8 +116,8 @@ def getLotteParcelStatus(parcelNumber):
             else:
                 try:
                     datetimeObj = datetime.strptime(strippedDateCell, "%Y-%m-%d %H:%M:%S.%f")
-                    except:
-                        print(f'Lotte Tracking produced erroneous datetime: {strippedDateCell}')
+                except:
+                    print(f'Lotte Tracking produced erroneous datetime: {strippedDateCell}')
 
         except:
             print(f'Lotte Tracking produced erroneous datetime: {strippedDateCell}')
@@ -157,7 +157,7 @@ def getHanjinParcelStatus(parcelNumber):
 
     res.raise_for_status()
 
-    resultsPageSOUP = bs4.BeautifulSoup(res.text, features='lxml')
+    resultsPageSOUP = bs4.BeautifulSoup(res.text, features="html.parser")
 
     resultsTable_entire = resultsPageSOUP.findAll('tbody')[1] #Table 1 is some sort of invoice for the parcel service.
 

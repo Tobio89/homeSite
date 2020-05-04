@@ -255,14 +255,57 @@ def shipping():
     parcelsCurrentlyTracked = ParcelInfo.query.all()
 
     if request.method == 'POST':
-        newItem_deliveryCompany = request.form.get('selectedParcelProvider')
-        newItem_parcelNumber = request.form.get('parcelNumber')
-        newItem_description = request.form.get('parcelDescription')
+        
+        if 'addParcelInfo' in request.form:
 
-        db.session.add(ParcelInfo(trackingNumber=newItem_parcelNumber, company=newItem_deliveryCompany, description=newItem_description, delivered=False))
+            newItem_deliveryCompany = request.form.get('selectedParcelProvider')
+            newItem_parcelNumber = request.form.get('parcelNumber')
+            newItem_description = request.form.get('parcelDescription')
 
-        print(f"Add parcel {newItem_parcelNumber} delivered by {newItem_deliveryCompany}. It's a {newItem_description}")
-        db.session.commit()
+            db.session.add(ParcelInfo(trackingNumber=newItem_parcelNumber, company=newItem_deliveryCompany, description=newItem_description, delivered=False))
+
+            print(f"Add parcel {newItem_parcelNumber} delivered by {newItem_deliveryCompany}. It's a {newItem_description}")
+            db.session.commit()
+
+            return redirect(url_for('shipping'))
+        
+        elif 'parcelToCheck' in request.form:
+
+            requestedParcel = request.form.get('parcelToCheck')
+
+            print(requestedParcel)
+
+            parcelToCheck = ParcelInfo.query.filter_by(id=requestedParcel).first()
+
+            if parcelToCheck.company == "CJ":
+                print('Initialising CJ Tracking check')
+
+                parcelToCheck_results = getCJParcelStatus(parcelToCheck.trackingNumber)
+
+                print(parcelToCheck_results)
+            
+            elif parcelToCheck.company == "Lotte":
+                print('Initialising Lotte Tracking check')
+
+                parcelToCheck_results = getLotteParcelStatus(parcelToCheck.trackingNumber)
+
+                print(parcelToCheck_results)
+
+
+
+            elif parcelToCheck.company == "HanJin":
+                print('Initialising HanJin Tracking check')
+
+                parcelToCheck_results = getHanJinParcelStatus(parcelToCheck.trackingNumber)
+
+                print(parcelToCheck_results)
+
+
+
+            
+
+
+            print(parcelToCheck.company)
         
 
     return render_template('shipping.html', companies=parcelProviders, parcels=parcelsCurrentlyTracked)
