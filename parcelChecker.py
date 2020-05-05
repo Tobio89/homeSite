@@ -56,6 +56,9 @@ def getCJParcelStatus(parcelNumber):
         except:
             print(f'CJ Tracking produced erroneous datetime: {results[1]}')
 
+        if '완료' in results[0]:
+            results[0] = '배달완료'
+
         resultsDict = {
                         'status' : results[0],
                         'dateTime' : datetimeObj,
@@ -73,9 +76,6 @@ LotteParcelNumber = '402175371732'
 def getLotteParcelStatus(parcelNumber):
 
     LotteTekbaeUrl = r'https://www.lotteglogis.com/home/reservation/tracking/index'
-
-    driver = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver', options=options)
-
 
     options = Options()
     options.add_argument("--headless")
@@ -130,6 +130,8 @@ def getLotteParcelStatus(parcelNumber):
         except:
             print(f'Lotte Tracking produced erroneous datetime: {strippedDateCell}')
 
+        if '완료' in results[0]:
+            results[0] = '배달완료'
 
         resultsDict = {
             'status' : results[0],
@@ -155,7 +157,7 @@ def getLotteParcelStatus(parcelNumber):
 
 # HanJinParcelNumber = '507897901630'
 HanJinParcelNumber = 	'507901323591'
-def getHanjinParcelStatus(parcelNumber):
+def getHanJinParcelStatus(parcelNumber):
     BS4headers = {'User-Agent' : 'Chrome/70.0.3538.77'}
 
 
@@ -183,6 +185,9 @@ def getHanjinParcelStatus(parcelNumber):
 
     results = results[:-1] # Remove poorly formatted final cell
     results.extend(splitFinalCell) # Add usable data from final cell.
+
+    if '완료' in results[3]:
+        results[3] = '배달완료'
 
     try:
         datetimeObj = None

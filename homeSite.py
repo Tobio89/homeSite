@@ -12,7 +12,7 @@ from flask_migrate import Migrate
 from wtforms import StringField, SubmitField, IntegerField, RadioField
 from wtforms.validators import DataRequired, Optional
 
-from parcelChecker import getCJParcelStatus, getHanjinParcelStatus, getLotteParcelStatus
+from parcelChecker import getCJParcelStatus, getHanJinParcelStatus, getLotteParcelStatus
 
 import setENV
 
@@ -267,45 +267,78 @@ def shipping():
             print(f"Add parcel {newItem_parcelNumber} delivered by {newItem_deliveryCompany}. It's a {newItem_description}")
             db.session.commit()
 
+            flash('Parcel added', 'info')
+
             return redirect(url_for('shipping'))
         
-        elif 'parcelToCheck' in request.form:
+        elif "update" in request.form:
 
-            requestedParcel = request.form.get('parcelToCheck')
-
-            print(requestedParcel)
-
-            parcelToCheck = ParcelInfo.query.filter_by(id=requestedParcel).first()
-
-            if parcelToCheck.company == "CJ":
-                print('Initialising CJ Tracking check')
-
-                parcelToCheck_results = getCJParcelStatus(parcelToCheck.trackingNumber)
-
-                print(parcelToCheck_results)
-            
-            elif parcelToCheck.company == "Lotte":
-                print('Initialising Lotte Tracking check')
-
-                parcelToCheck_results = getLotteParcelStatus(parcelToCheck.trackingNumber)
-
-                print(parcelToCheck_results)
-
-
-
-            elif parcelToCheck.company == "HanJin":
-                print('Initialising HanJin Tracking check')
-
-                parcelToCheck_results = getHanJinParcelStatus(parcelToCheck.trackingNumber)
-
-                print(parcelToCheck_results)
-
-
+            print('Requested update tracking information')
 
             
+            requestedParcel = request.form.get('parcelToUpdate')
 
+            if requestedParcel:
 
-            print(parcelToCheck.company)
+                print(requestedParcel)
+
+                queriedParcel = ParcelInfo.query.filter_by(id=requestedParcel).first()
+
+                if queriedParcel.company == "CJ":
+                    print('Initialising CJ Tracking check')
+                    tracking_results = getCJParcelStatus(queriedParcel.trackingNumber)
+                
+                elif queriedParcel.company == "Lotte":
+                    print('Initialising Lotte Tracking check')
+                    tracking_results = getLotteParcelStatus(queriedParcel.trackingNumber)
+
+                elif queriedParcel.company == "HanJin":
+                    print('Initialising HanJin Tracking check')
+                    tracking_results = getHanJinParcelStatus(queriedParcel.trackingNumber)
+
+                if tracking_results:
+
+                    queriedParcel.status = tracking_results['status']
+                    queriedParcel.location = tracking_results['location']
+                    queriedParcel.timestamp = tracking_results['dateTime']
+                    queriedParcel.extraNotes = tracking_results['extra']
+
+                    if tracking_results['status'] == '배달완료':
+                        queriedParcel.delivered = True
+                
+                    db.session.commit()
+
+                    flash(f'Collected tracking info for {queriedParcel.trackingNumber}', 'success')
+
+                    return redirect(url_for('shipping'))
+                
+                else:
+
+                    flash('Failed to collect tracking info', 'danger')
+            else:
+                
+                flash("No parcel selected to update: can't update", 'info')
         
+        elif "remove" in request.form:
+            print('Requested remove parcel')
+
+            requestedParcel = request.form.get('parcelToUpdate')
+
+            if requestedParcel:
+
+                queriedParcel = ParcelInfo.query.filter_by(id=requestedParcel).first()
+
+                db.session.delete(queriedParcel)
+
+                db.session.commit()
+
+                flash(f'Successfully deleted parcel: {queriedParcel.description}', 'info')
+
+                return redirect(url_for('shipping'))
+
+            else:
+
+                flash("No parcel selected: can't delete.", 'info')
+
 
     return render_template('shipping.html', companies=parcelProviders, parcels=parcelsCurrentlyTracked)
