@@ -38,9 +38,11 @@
                 <td>
                     {{item.itemName}}
                 </td>
-                <td>{% if item.quantity %}
+                <td>
+                    {% if item.quantity %}
                     {{item.quantity}}
-                </td>{% endif %}
+                    {% endif %}
+                </td>
             </tr>
         {% endfor %}
     </table>

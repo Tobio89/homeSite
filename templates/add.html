@@ -31,12 +31,30 @@
 <br />
 
 <div class="container">
-    {% if items %}
-    <ul class="list-group">
+    <table>
+        
+        
+        {% if items %}
+    
+        <th style="width:500px">
+            Item
+        </th>
+        <th>
+            <!-- blank -->
+        </th>
         {% for item in items %}
-            <li class="list-group-item">{{item}}</li>
+        <tr>
+            <td>
+                {{item.itemName}}
+            </td>
+            <td>
+                {% if item.quantity %}
+                {{item.quantity}}
+                {% endif %}
+            </td>
+        </tr>
         {% endfor %}
-    </ul>
+    </table>
     {% else %}
         <div class="list-group-heading" style="padding-left: 50px;">
             There's nothing on here. Add some items!
@@ -44,22 +62,33 @@
     {% endif %}
 </div>
 <br />
+<br />
+<div class="container">
+    <table>
     <form class="form" method="post" role="form">
-        {{ form.hidden_tag() }}
-        {{ wtf.form_errors(form, hiddens="only") }}
-      <div style="width:40%; float:left; padding:0 20px 0 60px;">
-        {{ wtf.form_field(form.item) }}
-        
-    </div>
-    <div style="float:left; width:10%">
-        {{ wtf.form_field(form.quant) }}
-    </div>
-    <br />
-    <div style="padding:80px 20px 0 60px">
-        {{ wtf.form_field(form.submit) }}
-    </div>
-        
+        <tr>
 
-      </form>
+        <td style="width: 300px; padding-right: 10px;">
+            
+                {{ form.hidden_tag() }}
+                {{ wtf.form_errors(form, hiddens="only") }}
+
+                {{ wtf.form_field(form.item) }}   
+
+        </td>
+        <td style="width: 100px;">
+                {{ wtf.form_field(form.quant) }}          
+            
+        </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+   
+                {{ wtf.form_field(form.submit) }}
+            </td>
+        </tr>
+    </form>
+    </table>
+</div>
 <!-- {{ wtf.quick_form(form)}} -->
 {% endblock %}
