@@ -24,19 +24,36 @@
 </div>
 <div class="container">
     {% if items %}
-    <ul class="list-group">
+    <table>
+        <tr>
+            <th style="width: 90%;">
+                Item
+            </th>
+            <th style="width: 10%;">
+                
+            </th>
+        </tr>
         {% for item in items %}
-            <li class="list-group-item">{{item}}</li>
+            <tr>
+                <td>
+                    {{item.itemName}}
+                </td>
+                <td>{% if item.quantity %}
+                    {{item.quantity}}
+                </td>{% endif %}
+            </tr>
         {% endfor %}
-    </ul>
+    </table>
     <br/>
     <form method="POST">
-        <ul style="list-style-type:none">
-            <li><input type='radio' name="emailRecipient" value="Toby"> Email list to Toby</input></li>
-            <li><input type='radio' name="emailRecipient" value="Eileen"> Email list to Eileen</input></li>
-        </ul>
+        
+            <input type='radio' name="emailRecipient" value="Toby"> Email list to Toby</input>
+            <br/>
+            <input type='radio' name="emailRecipient" value="Eileen"> Email list to Eileen</input>
+            <br />
             <br />
             <button type="submit" >Send!</button>
+
     </form> 
     {% else %}
         <div class="list-group-heading" style="padding-left: 50px;">
