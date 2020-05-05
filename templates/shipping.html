@@ -41,15 +41,43 @@
 
 <div class="container">
     <table class="table">
+
+        <style>
+
+
+            @media only screen and (max-width: 768px) {
+                #extra, tr td:nth-child(7)		{ display:none; visibility:hidden; }
+            }
+
+
+            @media only screen and (max-width: 680px) {
+                #company, tr td:nth-child(2)	    { display:none; visibility:hidden; }
+                #extra, tr td:nth-child(7)		{ display:none; visibility:hidden; }
+
+            }
+
+            @media only screen and (max-width: 520px) {
+                #company, tr td:nth-child(2)	    { display:none; visibility:hidden; }
+                #trackingNumber, tr td:nth-child(3)	{ display:none; visibility:hidden; }
+                #location, tr td:nth-child(6)	{ display:none; visibility:hidden; }
+                #extra, tr td:nth-child(7)		{ display:none; visibility:hidden; }
+
+            }
+
             
-        <th>Item:</th>
-        <th>Company:</th>
-        <th>Tracking Number:</th>
-        <th>Timestamp:</th>
-        <th>Status:</th>
-        <th>Location:</th>
-        <th style="width: 30%;">Extra:</th>
-        <th></th>
+}
+
+
+        </style>
+            
+        <th id="item">Item:</th>
+        <th id="company">Company:</th>
+        <th id="trackingNumber">Tracking Number:</th>
+        <th id="timestamp">Timestamp:</th>
+        <th id="status">Status:</th>
+        <th id="location">Location:</th>
+        <th id="extra" style="width: 30%;">Extra:</th>
+        <th id="selection"></th>
 
         {% if parcels %}
 
