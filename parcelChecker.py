@@ -8,10 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 from datetime import datetime
-# from selenium.webdriver.support.ui import Select
 
-# BS4headers = {'User-Agent' : 'Chrome/70.0.3538.77'}
-# driver = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver')
 
 CJParcelNumber = '630200846612'
 def getCJParcelStatus(parcelNumber):
@@ -20,21 +17,24 @@ def getCJParcelStatus(parcelNumber):
     
 
     options = Options()
-    options.add_argument("--headless")
-    options.headless = True # This option is used to show or hide the browser window whilst working.
-    # driver = webdriver.Firefox(options=options)
-    driver = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver', options=options)
-    driver.get(CJTEKBAEurl)
-    if options.headless == True:
-        print ("Headless Firefox Initialized")
+    options.add_argument("--headless") # This opens headless (windowless) Chrome/ium
+    
+    try: # This covers the pi and win computers keeping Chrome path in different places. Could Pi work without it?
+        print('Trying Pi Path:')
+        driver = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver', options=options)
+    except:
+        print('Trying Win Path:')
+        driver = webdriver.Chrome(options=options)
 
-    CJEnterParcelNumberForm = driver.find_element_by_id("paramInvcNo")
+    driver.get(CJTEKBAEurl)
+    print('Headless Chrome Initialised...')
+    CJEnterParcelNumberForm = driver.find_element_by_id("paramInvcNo") #Tracking number input box
     print('Located parcel number input box')
     CJEnterParcelNumberForm.send_keys(parcelNumber)
-    CJEnterParcelNumberForm.send_keys(Keys.ENTER)
+    CJEnterParcelNumberForm.send_keys(Keys.ENTER) # Enter the number and press enter
     print('Entered parcel number')
-    element = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.ID, "statusDetail"))
+    element = WebDriverWait(driver, 10).until( # Wait until it loads
+            EC.presence_of_element_located((By.ID, "statusDetail")) #This table appears when loaded
         )
     print('Detail table loaded')
 
@@ -44,17 +44,15 @@ def getCJParcelStatus(parcelNumber):
 
     driver.quit()
 
-    CJParcelTable_BottomRow = CJSoup.findAll('tr')[-2] # -1 is a blank row.
+    CJParcelTable_BottomRow = CJSoup.findAll('tr')[-2] # The bottom row is a blank row, so use -2
     CJParcelCells = CJParcelTable_BottomRow.findAll('td')
 
     results = [cell.get_text() for cell in CJParcelCells]
 
-    # for result in results:
-    #     print(result)
     try:
         datetimeObj = None
         try:
-            datetimeObj = datetime.strptime(results[1], "%Y-%m-%d %H:%M:%S.%f")
+            datetimeObj = datetime.strptime(results[1], "%Y-%m-%d %H:%M:%S.%f") #Create versatile datetime object out of date provided
         except:
             print(f'CJ Tracking produced erroneous datetime: {results[1]}')
 
@@ -76,15 +74,21 @@ def getLotteParcelStatus(parcelNumber):
 
     LotteTekbaeUrl = r'https://www.lotteglogis.com/home/reservation/tracking/index'
 
+    driver = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver', options=options)
+
 
     options = Options()
-    options.headless = True # This option is used to show or hide the browser window whilst working.
-    # driver = webdriver.Firefox(options=options)
-    driver = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver')
-    driver.get(LotteTekbaeUrl)
-    if options.headless == True:
-        print ("Headless Firefox Initialized")
+    options.add_argument("--headless")
+    
+    try: #This allows the script to find Chromedriver on both PI and Win. Need to attempt without specified path on PI too.
+        print('Trying Pi Path:')
+        driver = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver', options=options)
+    except:
+        print('Trying Win Path:')
+        driver = webdriver.Chrome(options=options)
 
+    driver.get(LotteTekbaeUrl)
+    print('Headless Chrome Initialised...')
     LotteEnterParcelNumberForm = driver.find_element_by_id("InvNo")
     print('Located parcel number input box')
     LotteEnterParcelNumberForm.send_keys(parcelNumber)
@@ -93,7 +97,7 @@ def getLotteParcelStatus(parcelNumber):
     print('Found button')
     LotteSubmitButton.click()
     print('Clicked button')
-    element = WebDriverWait(driver, 10).until(
+    element = WebDriverWait(driver, 10).until( # The XPATH for the results table
             EC.presence_of_element_located((By.XPATH, "/html/body/div[2]/div[2]/div[3]/div/div[2]/table[2]"))
             )
 
@@ -105,7 +109,7 @@ def getLotteParcelStatus(parcelNumber):
 
     LotteSoup = bs4.BeautifulSoup(LotteParcelTable, features="html.parser")
     driver.quit()
-    LotteParcelTable_BottomRow = LotteSoup.findAll('tr')[-1]
+    LotteParcelTable_BottomRow = LotteSoup.findAll('tr')[-1] #Lotte's results are in the bottom row.
     LotteParcelCells = LotteParcelTable_BottomRow.findAll('td')
 
     results = [cell.get_text() for cell in LotteParcelCells]
@@ -114,7 +118,7 @@ def getLotteParcelStatus(parcelNumber):
         datetimeObj = None
         try:
 
-            if strippedDateCell.endswith('\xa0--:--'):
+            if strippedDateCell.endswith('\xa0--:--'): #The bottom row can have an oddly formatted date. This cuts it off.
                 timeLessDate = results[1].strip()[:-6]
                 datetimeObj = datetime.strptime(timeLessDate, "%Y-%m-%d")
             else:
@@ -134,7 +138,7 @@ def getLotteParcelStatus(parcelNumber):
             'extra': results[3]
         }
         return resultsDict
-    except:
+    except: #This covers Lotte's expired tracking number result
         if len(results) == 1 and results[0] == '화물추적 내역이 없습니다.':
             print('Parcel number has expired!')
             return {
@@ -163,7 +167,7 @@ def getHanjinParcelStatus(parcelNumber):
 
     resultsPageSOUP = bs4.BeautifulSoup(res.text, features="html.parser")
 
-    resultsTable_entire = resultsPageSOUP.findAll('tbody')[1] #Table 1 is some sort of invoice for the parcel service.
+    resultsTable_entire = resultsPageSOUP.findAll('tbody')[1] #The first table [0] is some sort of invoice for the parcel service.
 
     resultsTable_rows = resultsTable_entire.findAll('tr')
 
@@ -174,8 +178,8 @@ def getHanjinParcelStatus(parcelNumber):
     results = [cell.get_text() for cell in resultCells]
 
     splitFinalCell = results[-1].splitlines() # The final cell is formatted poorly. Separate this into a list.
-    splitFinalCell = [cell.strip() for cell in splitFinalCell] #Strip excess whiespace cars
-    splitFinalCell = [cell for cell in splitFinalCell if cell] #Remove list entries
+    splitFinalCell = [cell.strip() for cell in splitFinalCell] #Strip excess whitespace chars
+    splitFinalCell = [cell for cell in splitFinalCell if cell] #Remove blank list entries
 
     results = results[:-1] # Remove poorly formatted final cell
     results.extend(splitFinalCell) # Add usable data from final cell.
