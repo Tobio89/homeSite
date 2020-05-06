@@ -13,6 +13,7 @@ from wtforms import StringField, SubmitField, IntegerField, RadioField
 from wtforms.validators import DataRequired, Optional
 
 from parcelChecker import getCJParcelStatus, getHanJinParcelStatus, getLotteParcelStatus
+from tasks import recurringTask
 
 import setENV
 
@@ -349,3 +350,74 @@ def shipping():
 
 
     return render_template('shipping.html', companies=parcelProviders, parcels=parcelsCurrentlyTracked)
+
+
+@app.route('/tasks', methods=['GET', 'POST'])
+def tasks():
+
+    loadedTasks = Tasks.query.all()
+
+    loadedTasks_taskObjects = []
+    for task in loadedTasks:
+        taskObject = recurringTask(task.name, task.createdDate, task.interval, task.delay)
+        loadedTasks_taskObjects.append(taskObject)
+
+    dueToday = [task for task in loadedTasks_taskObjects if task.isDue(datetime.today())]
+    otherTasks = [task for task in loadedTasks_taskObjects if not task.isDue(datetime.today())]
+
+
+    if request.method == 'POST':
+
+        if 'remove' in request.form:
+
+            taskToRemove = request.form.get('taskToUpdate')
+            print('remove')
+            queriedTask = Tasks.query.filter_by(name=taskToRemove).first()
+            db.session.delete(queriedTask)
+            db.session.commit()
+
+            return redirect(url_for('tasks'))
+
+        elif 'delay' in request.form:
+
+            taskToDelay = request.form.get('taskToUpdate')
+            print('delay')
+            queriedTask = queriedTask = Tasks.query.filter_by(name=taskToDelay).first()
+            queriedTask.delay += 1
+
+            db.session.commit()
+
+            return redirect(url_for('tasks'))
+            
+        elif 'addTask' in request.form:
+            newTaskDescription = request.form.get('taskDescription')
+            newTaskStartingDate = datetime.strptime(request.form.get('taskDate'), '%Y-%m-%d')
+            newTaskStartingInterval = int(request.form.get('taskInterval'))
+
+            print('add')
+            print(newTaskDescription)
+
+            db.session.add(Tasks(name=newTaskDescription, createdDate=newTaskStartingDate, interval=newTaskStartingInterval))
+            db.session.commit()
+
+            return redirect(url_for('tasks'))
+
+        elif 'removeOther' in request.form:
+
+            
+            taskToRemove = request.form.get('undueTaskToRemove')
+            print('remove')
+            queriedTask = Tasks.query.filter_by(name=taskToRemove).first()
+            db.session.delete(queriedTask)
+            db.session.commit()
+
+            return redirect(url_for('tasks'))
+
+
+
+            
+
+
+
+
+    return render_template('tasks.html', todayTasks=dueToday, otherTasks=otherTasks)
