@@ -81,6 +81,13 @@ class ParcelInfo(db.Model): # Store Parcel Information
     location = db.Column(db.String(64)) #Store last update's location 
     extraNotes = db.Column(db.String(64)) #Store extra notes if given
 
+class Tasks(db.Model): # Keep task object information
+    __tablename__ = 'tasks'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64))
+    createdDate = db.Column(db.DateTime())
+    interval = db.Column(db.Integer())
+    delay = db.Column(db.Integer(), default=0)
 
 
 # FORMS
