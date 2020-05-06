@@ -65,10 +65,32 @@
 <br />
 <div class="container">
     <table>
+
+        <style> /* Responsiveness for the parcel tracking table */
+
+
+            #addItem {
+                width:300px;
+                padding-right: 20px;
+            }
+            #addQuantity {
+                width:100px;
+            }
+
+            @media only screen and (max-width: 520px) {
+
+                #addItem {width:70%; padding-right: 10px;}
+                #addQuantity {width:30%}
+
+
+            }
+
+        </style>
+
     <form class="form" method="post" role="form">
         <tr>
 
-        <td style="width: 300px; padding-right: 10px;">
+        <td id="addItem">
             
                 {{ form.hidden_tag() }}
                 {{ wtf.form_errors(form, hiddens="only") }}
@@ -76,7 +98,7 @@
                 {{ wtf.form_field(form.item) }}   
 
         </td>
-        <td style="width: 100px;">
+        <td id="addQuantity">
                 {{ wtf.form_field(form.quant) }}          
             
         </td>
