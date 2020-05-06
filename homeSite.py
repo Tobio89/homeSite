@@ -371,23 +371,36 @@ def tasks():
         if 'remove' in request.form:
 
             taskToRemove = request.form.get('taskToUpdate')
-            print('remove')
-            queriedTask = Tasks.query.filter_by(name=taskToRemove).first()
-            db.session.delete(queriedTask)
-            db.session.commit()
 
-            return redirect(url_for('tasks'))
+            if taskToRemove:
+                print('remove')
+                queriedTask = Tasks.query.filter_by(name=taskToRemove).first()
+                db.session.delete(queriedTask)
+                db.session.commit()
+
+                flash(f"Task '{queriedTask.name}' removed", 'success')
+
+                return redirect(url_for('tasks'))
+
+            else:
+                flash('No task selected to remove', 'danger')
 
         elif 'delay' in request.form:
 
             taskToDelay = request.form.get('taskToUpdate')
-            print('delay')
-            queriedTask = queriedTask = Tasks.query.filter_by(name=taskToDelay).first()
-            queriedTask.delay += 1
 
-            db.session.commit()
+            if taskToDelay:
+                print('delay')
+                queriedTask = queriedTask = Tasks.query.filter_by(name=taskToDelay).first()
+                queriedTask.delay += 1
 
-            return redirect(url_for('tasks'))
+                db.session.commit()
+
+                flash(f"Task '{queriedTask.name}' delayed by one day", 'success')
+
+                return redirect(url_for('tasks'))
+            else:
+                flash('No task selected to delay', 'danger')
             
         elif 'addTask' in request.form:
             newTaskDescription = request.form.get('taskDescription')
@@ -400,18 +413,29 @@ def tasks():
             db.session.add(Tasks(name=newTaskDescription, createdDate=newTaskStartingDate, interval=newTaskStartingInterval))
             db.session.commit()
 
+            flash(f"Task '{newTaskDescription}' added", 'success')
+
             return redirect(url_for('tasks'))
 
         elif 'removeOther' in request.form:
 
             
             taskToRemove = request.form.get('undueTaskToRemove')
-            print('remove')
-            queriedTask = Tasks.query.filter_by(name=taskToRemove).first()
-            db.session.delete(queriedTask)
-            db.session.commit()
 
-            return redirect(url_for('tasks'))
+            if taskToRemove:
+
+                print('remove')
+                queriedTask = Tasks.query.filter_by(name=taskToRemove).first()
+                db.session.delete(queriedTask)
+                db.session.commit()
+
+                flash(f"Task '{queriedTask.name}' removed", 'success')
+
+                return redirect(url_for('tasks'))
+            else:
+                flash('No task selected to remove', 'danger')
+
+            
 
 
 
