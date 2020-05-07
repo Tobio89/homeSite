@@ -2,21 +2,11 @@
 
 {% block title %}{{ super() }}What to buy{% endblock %}
 
-{% block subnav %}
-
-<div class="navbar-collapse collapse">
-    <ul class="nav navbar-nav">
-        <!-- To make sick stuff like dropdowns here we can't use li -->
-        <!-- Alternatively put a sub menu on each page -->
-        <li><a href="/shopping/add">Add</a></li>
-
-
-    </ul>
-    
-</div>
-{% endblock %}
 
 {% block content %}
+<div class="page-header" style="padding-left: 50px;">
+    <h1>You need to buy:</h1>
+</div>
 {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         <div class="container">
@@ -39,7 +29,7 @@
                         {% endif %}
                     </strong>
                         
-                    <br>{{ message }}</br>
+                    <br>{{ message }}
             {% endfor %}
                 
                 </div>
@@ -48,13 +38,9 @@
         {% endif %}
 {% endwith %}
 
-
-<div class="page-header" style="padding-left: 50px;">
-    <h1>You need to buy:</h1>
-</div>
 <div class="container">
     {% if items %}
-    <form method="POST">
+    <form method="POST" name="itemsToRemove">
     <table>
         <tr>
             <th style="width: 90%;">
@@ -74,7 +60,7 @@
                     {{item.quantity}}
                     {% endif %}
                 </td>
-                <td><input type="checkbox" name="itemToRemove" value="{{item}}"></td>
+                <td><input type="checkbox" name="itemToRemove" value="{{item.itemName}}"></td>
             </tr>
         {% endfor %}
     </table>
@@ -96,4 +82,45 @@
 
     
 </div>
+<br>
+<br>
+<div class="container" style="border: 1px solid black; padding: 10px;">
+    <style>
+        td{
+            padding:5px
+        }
+    </style>
+    
+    <form method=POST name="addItem"> <!-- Form for selecting the parcel provider -->
+        <table>
+            <tr>
+                <th colspan="2">
+                    <h4>Add Items:</h4>
+                </th>
+            </tr>
+            <tr>
+                <td>
+                    <label for="itemName">Item Name:</label>    
+                </td>
+
+                <td>
+                    <input type="text" id="itemName" name="itemName" required>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="itemQuant">Quantity:</label>
+                </td>
+                <td>
+                    <input type="number" id="itemQuant" name="itemQuant" min='1'>
+                </td>
+            </tr>
+            <tr style="height: 20px;">
+                <!-- blank -->
+            </tr>
+        </table>
+    <input type="submit" name="addItem" value="Add Item">
+    </form>
+</div>
+<br/>
 {% endblock %}

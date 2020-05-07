@@ -183,6 +183,7 @@ def shopping():
 
         if 'remove' in request.form:
             itemsToRemove = request.form.getlist('itemToRemove')
+            print(itemsToRemove)
             if itemsToRemove:
 
                 for item in itemsToRemove:
@@ -220,72 +221,33 @@ def shopping():
             print(f'Email sent to {recipientEmailAddress}')
             flash(f'The shopping list was mailed to Toby', 'success')
         
+        elif 'addItem' in request.form:
+
+            newItem_name = request.form.get('itemName')
+            newItem_quantity = request.form.get('itemQuant')
+
+            if newItem_name[0].islower():
+                newItem_name = newItem_name.capitalize()
+
+            if newItem_quantity:
+                if int(newItem_quantity) < 2: #Most items are 1 so there's no need to display it.
+                    newItem_quantity = None
+                else:
+                    newItem_quantity = int(newItem_quantity) #Int-ifty the number.
+
+            db.session.add(Grocery(itemName=newItem_name, quantity=newItem_quantity))
+
+            db.session.commit()
+
+            flash(f'Added new item: {newItem_name} {newItem_quantity}', 'success' )
+
+            return redirect(url_for('shopping'))
+
 
 
 
     return render_template('shopping.html', items=shoppingItems)
     
-@app.route('/shopping/add', methods=['GET', 'POST'])
-def shoppingAdd():
-
-    shoppingItems = Grocery.query.all()
-
-    form = AddItemForm()
-    session['itemToAdd'] = form.item.data
-    session['itemQuantity'] = form.quant.data
-    if form.validate_on_submit():
-        newItem = session.get('itemToAdd')
-        if newItem[0].islower():
-            newItem = newItem.capitalize()
-        
-        if session['itemQuantity'] and session['itemQuantity'] > 1:
-            db.session.add(Grocery(itemName=newItem, quantity=session['itemQuantity']))
-
-        else:
-            db.session.add(Grocery(itemName=newItem))
-
-        db.session.commit()
-
-        return redirect(url_for('shoppingAdd'))
-
-    return render_template('add.html', form=form, items=shoppingItems)
-    
-
-@app.route('/shopping/remove', methods=['GET', 'POST'])
-def shoppingRemove(): #This name here is what 'url_for' is using.
-
-    shoppingItems = Grocery.query.all()
-
-    
-    if request.method == 'POST':
-        removeItems = request.form.getlist('removeItem')
-
-        for item in removeItems:
-            print(f'Remove: {item}')
-            itemToRemoveSQLQUERY = Grocery.query.filter_by(itemName=item).first()
-            if itemToRemoveSQLQUERY:
-
-                db.session.delete(itemToRemoveSQLQUERY)            
-                session['failState'] = False
-                
-                 
-            else:
-                session['failState'] = True
-                
-                
-        db.session.commit()
-        if len(removeItems) > 1:
-            itemString = ', '.join(removeItems)
-            flash(f'The following items were removed: {itemString}')
-        else:
-            flash(f'The item: {removeItems[0]} was removed.')
-
-        return redirect(url_for('shoppingRemove'))
-
-
-    return render_template('remove.html', items=shoppingItems, fail=session.get('failState', False))
-
-
 @app.route('/shipping', methods=['GET', 'POST'])
 def shipping():
 
@@ -321,6 +283,8 @@ def shipping():
 
                 queriedParcel = ParcelInfo.query.filter_by(id=requestedParcel).first()
 
+                timestamp_whenLastChecked = queriedParcel.timestamp
+
                 if queriedParcel.company == "CJ":
                     print('Initialising CJ Tracking check')
                     tracking_results = getCJParcelStatus(queriedParcel.trackingNumber)
@@ -335,24 +299,32 @@ def shipping():
 
                 if tracking_results:
 
-                    trackingError = tracking_results['error']
-                    queriedParcel.status = tracking_results['status']
-                    queriedParcel.location = tracking_results['location']
-                    queriedParcel.timestamp = tracking_results['dateTime']
-                    queriedParcel.extraNotes = tracking_results['extra']
+                    timestamp_whenCheckedThisTime = tracking_results['dateTime']
 
-                    if tracking_results['status'] == '배달완료':
-                        queriedParcel.delivered = True
-                
-                    db.session.commit()
-
-                    if trackingError:
-                        flash(f'Tracking Number / Company error:\nCheck Number and Company and try again.', 'danger')
+                    if timestamp_whenCheckedThisTime == timestamp_whenLastChecked: #Check to see if anything has changed
+                        #If not, show this nessage
+                        flash("There is no new information - your parcel's status hasn't changed.", 'info')
+                    
                     else:
+                        #Else, update the info in the DB - now that it's worth doing.
+                        trackingError = tracking_results['error']
+                        queriedParcel.status = tracking_results['status']
+                        queriedParcel.location = tracking_results['location']
+                        queriedParcel.timestamp = tracking_results['dateTime']
+                        queriedParcel.extraNotes = tracking_results['extra']
 
-                        flash(f'Collected tracking info for {queriedParcel.trackingNumber}', 'success')
+                        if tracking_results['status'] == '배달완료':
+                            queriedParcel.delivered = True
+                    
+                        db.session.commit()
 
-                    return redirect(url_for('shipping'))
+                        if trackingError:
+                            flash(f'Tracking Number / Company error:\nCheck Number and Company and try again.', 'danger')
+                        else:
+
+                            flash(f'Collected tracking info for {queriedParcel.trackingNumber}', 'success')
+
+                        return redirect(url_for('shipping'))
                 
                 else:
 
