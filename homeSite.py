@@ -180,16 +180,45 @@ def shopping():
 
     recipientEmailAddress = None
     if request.method == 'POST':
-        recipient = request.form.get('emailRecipient')
-        if recipient == 'Toby':
-            recipientEmailAddress = os.environ.get('TOBY_ADDRESS')
-        elif recipient == 'Eileen':
+
+        if 'remove' in request.form:
+            itemsToRemove = request.form.getlist('itemToRemove')
+            if itemsToRemove:
+
+                for item in itemsToRemove:
+                    itemToRemoveSQLQUERY = Grocery.query.filter_by(itemName=item).first()
+                    db.session.delete(itemToRemoveSQLQUERY)
+
+
+                db.session.commit()
+
+                if len(itemsToRemove) > 1:
+
+                    flash(f"Items {', '.join(itemsToRemove)} removed from list", 'success')
+                else:
+                    flash(f'Item {itemsToRemove[0]} removed from list', 'success')
+
+                return redirect(url_for('shopping'))
+
+
+            else:
+                flash('No items selected to remove', 'danger')
+        elif 'eileen' in request.form:
+
             recipientEmailAddress = os.environ.get('EILEEN_ADDRESS')
-        
-        if recipientEmailAddress:
+
             send_email(recipientEmailAddress, 'Your Shopping List', 'shoppingMail', items=shoppingItems)
             print(f'Email sent to {recipientEmailAddress}')
-            flash(f'Your shopping list was mailed to {recipient}')
+            flash(f'The shopping list was mailed to Eileen', 'success')
+
+
+        elif 'toby' in request.form:
+
+            recipientEmailAddress = os.environ.get('TOBY_ADDRESS')
+            
+            send_email(recipientEmailAddress, 'Your Shopping List', 'shoppingMail', items=shoppingItems)
+            print(f'Email sent to {recipientEmailAddress}')
+            flash(f'The shopping list was mailed to Toby', 'success')
         
 
 
