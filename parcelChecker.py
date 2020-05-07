@@ -44,7 +44,22 @@ def getCJParcelStatus(parcelNumber):
 
     driver.quit()
 
-    CJParcelTable_BottomRow = CJSoup.findAll('tr')[-2] # The bottom row is a blank row, so use -2
+    try:
+        CJParcelTable_BottomRow = CJSoup.findAll('tr')[-2] # The bottom row is a blank row, so use -2
+    except:
+        print('Erroneous number entered: data gathering failed')
+        print('Are you sure that this number is a CJ number?')
+
+        resultsDict = {
+                        'error': True,
+                        'status' : 'Error',
+                        'dateTime' : None,
+                        'location' : '-',
+                        'extra': 'Failed to get data from CJ site.\nTry a different company.'
+                        }
+        return resultsDict
+
+
     CJParcelCells = CJParcelTable_BottomRow.findAll('td')
 
     results = [cell.get_text() for cell in CJParcelCells]
@@ -60,6 +75,7 @@ def getCJParcelStatus(parcelNumber):
             results[0] = '배달완료'
 
         resultsDict = {
+                        'error': False,
                         'status' : results[0],
                         'dateTime' : datetimeObj,
                         'location' : results[3],
@@ -97,12 +113,26 @@ def getLotteParcelStatus(parcelNumber):
     print('Found button')
     LotteSubmitButton.click()
     print('Clicked button')
-    element = WebDriverWait(driver, 10).until( # The XPATH for the results table
-            EC.presence_of_element_located((By.XPATH, "/html/body/div[2]/div[2]/div[3]/div/div[2]/table[2]"))
-            )
+    try:
+        element = WebDriverWait(driver, 10).until( # The XPATH for the results table
+                EC.presence_of_element_located((By.XPATH, "/html/body/div[2]/div[2]/div[3]/div/div[2]/table[2]"))
+                )
 
 
-    print('Detail table loaded')
+        print('Detail table loaded')
+    except:
+        print('Erroneous number entered: data gathering failed')
+        print('Are you sure that this number is a Lotte number?')
+
+        resultsDict = {
+                        'error': True,
+                        'status' : 'Error',
+                        'dateTime' : None,
+                        'location' : '-',
+                        'extra': 'Failed to get data from Lotte site.\nTry a different company.'
+                        }
+        return resultsDict
+        
 
     LotteParcelTable = element.get_attribute('innerHTML')
 
@@ -134,6 +164,7 @@ def getLotteParcelStatus(parcelNumber):
             results[0] = '배달완료'
 
         resultsDict = {
+            'error': False,
             'status' : results[0],
             'dateTime' : datetimeObj,
             'location' : results[2].strip(),
@@ -144,8 +175,9 @@ def getLotteParcelStatus(parcelNumber):
         if len(results) == 1 and results[0] == '화물추적 내역이 없습니다.':
             print('Parcel number has expired!')
             return {
+                'error': True,
                 'status' : results[0],
-                'dateTime': 'Expired',
+                'dateTime': None,
                 'location' : 'Expired',
                 'extra': 'Expired'
             }
@@ -169,7 +201,20 @@ def getHanJinParcelStatus(parcelNumber):
 
     resultsPageSOUP = bs4.BeautifulSoup(res.text, features="html.parser")
 
-    resultsTable_entire = resultsPageSOUP.findAll('tbody')[1] #The first table [0] is some sort of invoice for the parcel service.
+    try:
+        resultsTable_entire = resultsPageSOUP.findAll('tbody')[1] #The first table [0] is some sort of invoice for the parcel service.
+    except:
+        print('Erroneous number entered: data gathering failed')
+        print('Are you sure that this number is a HanJin number?')
+
+        resultsDict = {
+                        'error': True,
+                        'status' : 'Error',
+                        'dateTime' : None,
+                        'location' : '-',
+                        'extra': 'Failed to get data from HanJin site.\nTry a different company.'
+                        }
+        return resultsDict
 
     resultsTable_rows = resultsTable_entire.findAll('tr')
 
@@ -197,6 +242,7 @@ def getHanJinParcelStatus(parcelNumber):
             print(f'HanJin Tracking produced erroneous datetime: {results[0]} {results[1]}')
 
         resultsDict = {
+            'error': False,
             'dateTime' : datetimeObj,
             'location' : results[2],
             'status' : results[3],
@@ -208,9 +254,14 @@ def getHanJinParcelStatus(parcelNumber):
         print('Failed to extract data. Data gathered:')
         print(results)
         return False
-    
-# print(getCJParcelStatus(CJParcelNumber))
 
-# print(getLotteParcelStatus(LotteParcelNumber))
+newNumber = '363280712971'
+oddNumber = '383818348183'
 
-# print(getHanjinParcelStatus(HanJinParcelNumber))
+# print(getCJParcelStatus(newNumber))
+
+# print(getLotteParcelStatus(oddNumber))
+
+# print(getHanJinParcelStatus(newNumber))
+
+

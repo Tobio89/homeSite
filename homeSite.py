@@ -306,6 +306,7 @@ def shipping():
 
                 if tracking_results:
 
+                    trackingError = tracking_results['error']
                     queriedParcel.status = tracking_results['status']
                     queriedParcel.location = tracking_results['location']
                     queriedParcel.timestamp = tracking_results['dateTime']
@@ -316,7 +317,11 @@ def shipping():
                 
                     db.session.commit()
 
-                    flash(f'Collected tracking info for {queriedParcel.trackingNumber}', 'success')
+                    if trackingError:
+                        flash(f'Tracking Number / Company error:\nCheck Number and Company and try again.', 'danger')
+                    else:
+
+                        flash(f'Collected tracking info for {queriedParcel.trackingNumber}', 'success')
 
                     return redirect(url_for('shipping'))
                 
