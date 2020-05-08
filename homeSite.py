@@ -13,7 +13,7 @@ from wtforms import StringField, SubmitField, IntegerField, RadioField
 from wtforms.validators import DataRequired, Optional
 
 from parcelChecker import getCJParcelStatus, getHanJinParcelStatus, getLotteParcelStatus
-from tasks import recurringTask
+from tasks import recurringTask, oneTimeTask, getTimelessDate
 
 import setENV
 
@@ -86,9 +86,11 @@ class Tasks(db.Model): # Keep task object information
     __tablename__ = 'tasks'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
+    isSingleUse = db.Column(db.Boolean(), default=False)
     createdDate = db.Column(db.DateTime())
     interval = db.Column(db.Integer())
     delay = db.Column(db.Integer(), default=0)
+    completedDate = db.Column(db.DateTime()) #No date = not completed. Save date, and when this date is past, task can be removed automatically.
 
 
 # FORMS
@@ -365,8 +367,12 @@ def tasks():
 
     loadedTasks_taskObjects = []
     for task in loadedTasks:
-        taskObject = recurringTask(task.name, task.createdDate, task.interval, task.delay)
-        loadedTasks_taskObjects.append(taskObject)
+        if task.isSingleUse:
+            taskObject = oneTimeTask(name=task.name, scheduledDate=task.createdDate, delayedDays=task.delay)
+            loadedTasks_taskObjects.append(taskObject)
+        else:
+            taskObject = recurringTask(name=task.name, createdDate=task.createdDate, interval=task.interval, delayedDays=task.delay)
+            loadedTasks_taskObjects.append(taskObject)
 
     dueToday = [task for task in loadedTasks_taskObjects if task.isDue(datetime.today())]
     otherTasks = [task for task in loadedTasks_taskObjects if not task.isDue(datetime.today())]
@@ -409,19 +415,42 @@ def tasks():
                 flash('No task selected to delay', 'danger')
             
         elif 'addTask' in request.form:
+
+            newTaskIsRecurring = request.form.get('isRecurring')
+            print(newTaskIsRecurring)
             newTaskDescription = request.form.get('taskDescription')
             newTaskStartingDate = datetime.strptime(request.form.get('taskDate'), '%Y-%m-%d')
-            newTaskStartingInterval = int(request.form.get('taskInterval'))
 
-            print('add')
-            print(newTaskDescription)
+            # Is the task going to recurr...
+            if newTaskIsRecurring:
+                newTaskStartingInterval = int(request.form.get('taskInterval'))
 
-            db.session.add(Tasks(name=newTaskDescription, createdDate=newTaskStartingDate, interval=newTaskStartingInterval))
-            db.session.commit()
+                if newTaskStartingInterval > 0: #To handle an interval of 0
 
-            flash(f"Task '{newTaskDescription}' added", 'success')
+                    print('Add recurring task')
+                    print(newTaskDescription)
 
-            return redirect(url_for('tasks'))
+                    db.session.add(Tasks(name=newTaskDescription, createdDate=newTaskStartingDate, interval=newTaskStartingInterval))
+                    db.session.commit()
+
+                    flash(f"Recurring Task '{newTaskDescription}' added", 'success')
+
+                    return redirect(url_for('tasks'))
+                else:
+                    #Warn user that the interval was 0, which doesn't make sense
+                    flash("Oops - The interval can't be zero.", "danger")
+            
+            #...Or is it a one-time thing
+            else:
+                print('Add one-time task')
+
+                db.session.add(Tasks(name=newTaskDescription, createdDate=newTaskStartingDate, isSingleUse=True))
+                db.session.commit()
+
+                flash(f"One-Time Task '{newTaskDescription}' added", 'success')
+
+                return redirect(url_for('tasks'))
+
 
         elif 'removeOther' in request.form:
 

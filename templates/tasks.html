@@ -81,15 +81,17 @@
         td{
             padding:5px
         }
+        .interval {
+            visibility:hidden;
+        }
+        input#recurringTrigger:checked ~ table tr.interval {visibility: visible}
     </style>
-    
+    <h4>Add Task:</h4>
     <form method=POST name="addTask"> <!-- Form for selecting the parcel provider -->
+        <input type="checkbox" name="isRecurring" value="True" id=recurringTrigger> Recurring
+
         <table>
-            <tr>
-                <th colspan="2">
-                    <h4>Add Task:</h4>
-                </th>
-            </tr>
+
             <tr>
                 <td>
                     <label for="taskDescription">Task Description:</label>    
@@ -107,17 +109,29 @@
                     <input type="date" id="taskDate" name="taskDate" required>
                 </td>
             </tr>
-            <tr>
+            <!-- <tr>
+                <td>
+
+                    <input type="checkbox" name="taskType" value="Recurring task" id=recurringTrigger>Recurring
+
+  
+                </td>
+                <td>
+                    <input type="radio" name="taskType" value="One-time Task"> One-time
+                </td>
+            </tr> -->
+            <tr class=interval>
                 <td>
                     <label for="taskInterval">Interval:</label>
                 </td>
-                <td> 
-                    <input type="number" id="taskInterval" name="taskInterval" required>
+                <td class="selected"> 
+                    <input type="number" id="taskInterval" name="taskInterval" value="0">
                 </td>
             </tr>
             <tr style="height: 20px;">
                 <!-- blank -->
             </tr>
+
         </table>
     <input type="submit" name="addTask">
     </form>
@@ -163,4 +177,29 @@
 </div>
 <br>
 <br>
+
+<!-- <style>
+
+.rock, .gas, .ice {visibility: hidden;}
+
+input#rock:checked ~ table tr.rock {visibility: visible}
+
+input#gas:checked ~ table tr.gas {visibility: visible}
+
+input#ice:checked ~ table tr.ice {visibility: visible}
+
+input:checked ~ table tr {display:block}
+</style>
+
+<input type=checkbox id=rock><label> Terrestrial</label>
+<input type=checkbox id=gas><label> Gas Giant</label>
+<input type=checkbox id=ice><label> Ice Giant</label>
+<table>
+    <tr class=rock>
+        <td><input type="number" id="taskInterval" name="taskInterval" required>
+        </td>
+    </tr>
+    <tr class=ice><td>whatever for ice</td></tr>
+    <tr class=gas><td>whatever for gas</td></tr>
+</table> -->
 {% endblock %}
