@@ -40,7 +40,22 @@
 
 
 <div class="container">
-    <table class="table">
+    <style>
+        .stillToBeDone{
+            background-color: rgba(13, 255, 5, 0.418);
+            
+        }
+        .taskTable tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+        .taskTable tr:nth-child(even) {
+            background-color: #f8f8f8;
+        }
+        #selection{
+            width:30px;
+        }
+    </style>
+    <table class="table taskTable">
             
         <th id="item">Tasks Due Today:</th>
         <th id="selection"></th>
@@ -51,8 +66,12 @@
         
                 {% for task in todayTasks %}
                     <tr>
-                            
-                        <td id="task">{{task.name}}</td>
+                        {% if task.completedDate %}
+                        <td id="task">
+                        {% else %}
+                        <td id="task" class="stillToBeDone">
+                        {% endif %}                            
+                            {{task.name}}</td>
                         <td id="selection"><input type="radio" name="taskToUpdate" value="{{task.name}}"></td>
                             
                     </tr>  
@@ -65,6 +84,7 @@
     </table>
     <input type="submit" name="remove" value="Remove Task">
     <input type="submit" name="delay" value="Do Tomorrow">
+    <input type="submit" name="complete"value="Completed">
     </form>    
         {% else %}
 
@@ -82,9 +102,9 @@
             padding:5px
         }
         .interval {
-            visibility:hidden;
+            visibility: hidden;
         }
-        input#recurringTrigger:checked ~ table tr.interval {visibility: visible}
+        input#recurringTrigger:checked ~ table tr.interval {visibility: visible;}
     </style>
     <h4>Add Task:</h4>
     <form method=POST name="addTask"> <!-- Form for selecting the parcel provider -->
@@ -109,17 +129,6 @@
                     <input type="date" id="taskDate" name="taskDate" required>
                 </td>
             </tr>
-            <!-- <tr>
-                <td>
-
-                    <input type="checkbox" name="taskType" value="Recurring task" id=recurringTrigger>Recurring
-
-  
-                </td>
-                <td>
-                    <input type="radio" name="taskType" value="One-time Task"> One-time
-                </td>
-            </tr> -->
             <tr class=interval>
                 <td>
                     <label for="taskInterval">Interval:</label>
@@ -143,8 +152,9 @@
     <table class="table">
             
         <th id="item">Other Tasks:</th>
+        <th id="date">Next Due</th>
+        <th id="interval">Interval</th>
         <th id="selection"></th>
-        
 
         {% if otherTasks %}
         <form method="POST">
@@ -153,6 +163,14 @@
                     <tr>
                             
                         <td id="task">{{task.name}}</td>
+                        <td id="date">{{task.dueDate}}</td>
+                        <td id="interval">
+                            {% if task.interval %} 
+                                    Every {{ task.interval.days}} days
+                            {% else %}
+                                    Once
+                            {% endif %}
+                        </td>
                         <td id="selection"><input type="radio" name="undueTaskToRemove" value="{{task.name}}"></td>
                             
                     </tr>  

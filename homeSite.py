@@ -368,11 +368,41 @@ def tasks():
     loadedTasks_taskObjects = []
     for task in loadedTasks:
         if task.isSingleUse:
-            taskObject = oneTimeTask(name=task.name, scheduledDate=task.createdDate, delayedDays=task.delay)
-            loadedTasks_taskObjects.append(taskObject)
+            print(f'Task {task.name} is one-time')
+
+            if task.createdDate < getTimelessDate(datetime.today()):
+
+                print("Scheduled one-time task was scheduled for before today :S")
+                db.session.delete(task)
+                db.session.commit()
+
+
+            # Check if the task has a completed date allocated
+            elif task.completedDate:
+                
+                #If that date was yesterday, get rid
+                if getTimelessDate(task.completedDate) < getTimelessDate(datetime.today()):
+
+                    print("It's old and will be removed")
+                    db.session.delete(task)
+                    db.session.commit()
+                    
+                else: #Tasks here are complete, but they were completed today.
+                    taskObject = oneTimeTask(name=task.name, scheduledDate=task.createdDate, delayedDays=task.delay, completedDate=task.completedDate)
+                    loadedTasks_taskObjects.append(taskObject)
+
+
+            else: #Tasks that get here have no completed date, i.e they are still to be done.
+                taskObject = oneTimeTask(name=task.name, scheduledDate=task.createdDate, delayedDays=task.delay)
+                loadedTasks_taskObjects.append(taskObject)
+
+
+        # Tasks that get to this else are recurring tasks. Their completed date is less important.
         else:
-            taskObject = recurringTask(name=task.name, createdDate=task.createdDate, interval=task.interval, delayedDays=task.delay)
+            taskObject = recurringTask(name=task.name, createdDate=task.createdDate, interval=task.interval, delayedDays=task.delay, completedDate=task.completedDate)
             loadedTasks_taskObjects.append(taskObject)
+
+
 
     dueToday = [task for task in loadedTasks_taskObjects if task.isDue(datetime.today())]
     otherTasks = [task for task in loadedTasks_taskObjects if not task.isDue(datetime.today())]
@@ -414,6 +444,25 @@ def tasks():
             else:
                 flash('No task selected to delay', 'danger')
             
+        elif 'complete' in request.form:
+
+            taskToMarkCompleted = request.form.get('taskToUpdate')
+
+            if taskToMarkCompleted:
+                print('complete')
+                queriedTask = Tasks.query.filter_by(name=taskToMarkCompleted).first()
+                queriedTask.completedDate = getTimelessDate(datetime.today())
+
+                db.session.commit()
+
+                flash(f"Task '{queriedTask.name}' marked as completed", 'success')
+
+                return redirect(url_for('tasks'))
+
+            else:
+                flash('No task selected to mark as completed', 'danger')
+
+
         elif 'addTask' in request.form:
 
             newTaskIsRecurring = request.form.get('isRecurring')
