@@ -189,6 +189,7 @@ def getLotteParcelStatus(parcelNumber):
 
 # HanJinParcelNumber = '507897901630'
 HanJinParcelNumber = 	'507901323591'
+HanJinMidNumber = '507904287704'
 def getHanJinParcelStatus(parcelNumber):
     BS4headers = {'User-Agent' : 'Chrome/70.0.3538.77'}
 
@@ -240,14 +241,28 @@ def getHanJinParcelStatus(parcelNumber):
             datetimeObj = datetime.strptime(f'{results[0]} {results[1]}', "%Y-%m-%d %H:%M")
         except:
             print(f'HanJin Tracking produced erroneous datetime: {results[0]} {results[1]}')
+        
+        resultingDate = datetimeObj
+        resultingLocation = results[2]
+
+        if len(results) > 4:
+            resultingStatus = results[3]
+            resultingExtra = results[4]
+
+        else:
+            
+            resultingStatus = '배송중'
+            resultingExtra = results[3]
 
         resultsDict = {
-            'error': False,
-            'dateTime' : datetimeObj,
-            'location' : results[2],
-            'status' : results[3],
-            'extra' : results[4]
-        }
+                'error': False,
+                'dateTime' : resultingDate,
+                'location' : resultingLocation,
+                'status' : resultingStatus,
+                'extra' : resultingExtra
+            }
+        
+            
 
         return resultsDict
     except:
@@ -258,10 +273,16 @@ def getHanJinParcelStatus(parcelNumber):
 newNumber = '363280712971'
 oddNumber = '383818348183'
 
-# print(getCJParcelStatus(newNumber))
-
-# print(getLotteParcelStatus(oddNumber))
-
-# print(getHanJinParcelStatus(newNumber))
 
 
+
+if __name__ == "__main__":
+    print('Testing mode')
+
+    # print(getCJParcelStatus(newNumber))
+
+    # print(getLotteParcelStatus(oddNumber))
+
+    # print(getHanJinParcelStatus(HanJinParcelNumber))
+
+    # print(getHanJinParcelStatus(HanJinMidNumber))
