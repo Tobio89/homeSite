@@ -125,7 +125,7 @@ def getWisdom():
 
 # Constant Variables
 
-timeList = [f'{num}' for num in range(0, 24)]
+timeList = [f'{num}'.zfill(2) for num in range(0, 24)]
 parcelProviders = ['HanJin', 'CJ', 'Lotte']
 
 
@@ -136,16 +136,48 @@ def index():
     content = getWisdom()
     return render_template('index.html', textContent=content)
 
-@app.route('/schedule')
+@app.route('/schedule',  methods=['GET', 'POST'])
 def schedule():
 
     scheduleString = Schedule.query.first().stringSchedule
     scheduleList = [letter for letter in scheduleString]
 
+    combined_schedule = []
+    for i in range(len(timeList)):
+        combined_schedule.append(
+            {
+                'hour' : timeList[i],
+                'sched': scheduleList[i]
+            }
+        )
+
+    
     currentHour = datetime.now().hour
+
+    if request.method == 'POST':
+        if 'submitEdit' in request.form:
+            newSchedule = request.form.getlist('newSchedule')
+            newSchedule_joined = ''.join(newSchedule)
+            print(newSchedule_joined)
+
+            if newSchedule_joined == scheduleString:
+                flash(f' No changes detected', 'info')
+                print('Requested schedule is the same as old schedule - no changes made')
+
+            else:
+                schedule_loaded_from_database = Schedule.query.first()
+                schedule_loaded_from_database.stringSchedule = newSchedule_joined
+                db.session.commit()
+                print(f'Edited to: {newSchedule_joined}')
+                flash('Schedule updated', 'success')
+                return redirect(url_for('schedule'))
+            
+
+            
+
     
    
-    return render_template('schedule.html', timeTitle=timeList, schedule=scheduleList, currentHour=str(currentHour))
+    return render_template('schedule.html', schedule=combined_schedule, currentHour=str(currentHour))
 
 @app.route('/schedule/edit', methods=['GET', 'POST'])
 def editSchedule():

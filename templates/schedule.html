@@ -5,25 +5,47 @@
 
 {% block title %}{{ super() }}Our Robinschedule{% endblock %}
 
-{% block subnav %}
-
-
-
-<div class="navbar-collapse collapse">
-    <ul class="nav navbar-nav">
-        <!-- To make sick stuff like dropdowns here we can't use li -->
-        <!-- Alternatively put a sub menu on each page -->
-        <li><a href="/schedule/edit">Edit</a></li>
-
-    </ul>
-    
-</div>
-{% endblock %}
-
 {% block content %}
-<div class="page-header" style="padding-left: 50px;">
-    <h1>Who's looking after Robin now?</h1>
+<div class="page-header" style="padding: 0 0 3vw 3vw;">
+    <h1>Who's looking after Robin now?</h1>  
+
 </div>
+
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="container">
+            {% for category, message in messages %}
+                <p>
+                
+                <div class="alert alert-{{category}}" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <strong>
+                        {% if category == 'info' %}
+                            Information:
+                        {% elif category == 'danger' %}
+                            ERROR:
+                        {% elif category == 'success' %}
+                            Success:
+                        {% else %}
+                            {{category}}
+                        {% endif %}
+                    </strong>
+                        
+                    <br>{{ message }}
+            {% endfor %}
+                
+                </div>
+                </p>
+        </div>
+        {% endif %}
+{% endwith %}
+
+
+
+
 <div class="container-fluid">
     <style>
     .current{
@@ -32,14 +54,14 @@
        -moz-box-shadow:inset 0px 0px 0px 4px #f00;
        box-shadow:inset 0px 0px 0px 4px #f00; 
     }
-    .eileen{
+    .person-E{
         background-color: gold;
     }
-    .toby{
+    .person-T{
         background-color: mediumslateblue;
     }
 
-    .both{
+    .person-B{
         background-color: mediumseagreen;
     }
     td{
@@ -48,62 +70,205 @@
     #currentCell{
         font-weight:bolder;
     }
+    .sched-table{
+        display: flex;
+        flex-direction: row;
+        flex-flow:wrap;
+        background: lightgrey;
+    }
+    .sched-column{
+        flex-grow: 1;
+        flex-basis:0px;
+        justify-content: stretch;
+        box-sizing: border-box;
+        padding: 0.1em;
+        /* min-width: 1em; */
+        /* max-width: 4vw */
+        /* width:0; */
+        
+        /* padding-bottom: 10px; */
+        /* border:1px solid black */
+    }
+    .sched-cell{
+        
+        align-items: flex-start;
+        border: 1px solid black;
+        text-align: center;
+    }
+    .sched-heading{
+        background: white;
+    }
+    /* .sched-table:nth-child(even){
+        background:lightgray; */
+    .hide{
+        height:0px;
+        opacity:0;
+    }
+    .show{
+        height:30px;
+        opacity:100;
+    }
+    .default-cell{
+        display: block;
+    }
+    .editing-cell{
+        display: none;
+    }
+    #submit-button{
+        display: none;
+        padding:10px;
+    }
+    #edit-button{
+        padding:10px;
+    }
+    /* #toggle:checked .sched-column {
+        height:30px;
+        opacity:100;
+    } */
+    /* #toggle:checked .sched-column>.secret-cell{
+        height: 30px;
+        opacity: 100;
+    } */
+    @media only screen and (max-width: 520px) {
+        .sched-column{
+            justify-content: space-between;
+            /* padding-bottom: 10px; */
+            }
+    } 
     </style>
  
-    <div class="table-responsive" style="overflow-x: auto;">
-        
-    <table class="table schedtable">
-        <tr>
-            {% for timeHeading in timeTitle %}
-                {% if timeHeading == currentHour %}
-                <th class="current">
-                    <div id="currentCell">{{timeHeading}}:00</div>
-                </th>
-                {% else %}
-                <th>
-                    {{timeHeading}}:00
-                </th>
+<form method="POST">
+<div class="sched-table">
+    
+       
+    {% for cell in schedule %}
+        <div class="sched-column">
 
-                {% endif %}
+            {% if cell.hour == currentHour %}
+            <div class="sched-cell sched-heading current">
+                <div id='currentCell'>
+                    {{cell.hour}}:00
+                </div>
+            </div>
+
+            {% else %}
+            <div class="sched-cell sched-heading">
+            
+                    {{cell.hour}}:00
+
+            </div>
+            {% endif %}
+
+            <div class="sched-cell default-cell person-{{cell.sched}}">
+
+                {{cell.sched}}
+
+            </div>
+
+            {% if cell.sched == 'E' %}
+            <div class="sched-cell editing-cell person-E">
                 
-            {% endfor %}
-
-        </tr>
-        <tr>
-            {% for scheduleCell in schedule %}
-                {% if scheduleCell == 'E' %} 
-                <td class="eileen">
-                    {{scheduleCell}}
-                </td>
-                {% elif scheduleCell == 'T' %}
-                <td class="toby">
-                    {{scheduleCell}}
-                </td>
-                {% else %}
-                <td class="both">
-                    {{scheduleCell}}
-                </td>
+                
+                <select name="newSchedule">
+                    <option value="E" selected>E</option>
+                    <option value="T">T</option>
+                    <option value="B">B</option>
+                </select>
+            </div>
+               
+        
+            {% elif cell.sched == 'T' %}
+            <div class="sched-cell editing-cell person-T">
+            
+                <select name="newSchedule">
+                    <option value="E">E</option>
+                    <option value="T" selected>T</option>
+                    <option value="B">B</option>
+                </select>
+            </div>
+            
+            
+            {% else %}
+            <div class="sched-cell editing-cell person-B"> 
+                <select name="newSchedule">
+                    <option value="E">E</option>
+                    <option value="T">T</option>
+                    <option value="B" selected>B</option>
+                </select>
+            </div>      
                 {% endif %}
-            {% endfor %}
-        </tr>
-    </table>
-    <!-- Script to make table scroll to current cell, if scroll bar -->
-    <script>
-        const currentCellLoc = document.getElementById('currentCell');
-        currentCellLoc.scrollIntoView(true);
-    </script>
-    </div>
+            
    
+
+        </div>
+    {% endfor %}
+    
+</div>
+
+<div id="submit-button">
+    <button type="submit" formmethod="post" name="submitEdit" >Submit New Schedule</button>
+</div>
+</form>
+<div id="edit-button">
+    <!-- <script>
+        function myFunction() {
+
+            var hiddenCells = document.getElementsByClassName('editing-cell');
+                for (var i=0; i<hiddenCells.length; ++i){
+
+                    var s = hiddenCells[i].style;
+                        s.display = s.display==='block' ? 'none' : 'block';
+                }; // End of for loop
+            } // End of function
+        
+        
+
+    </script> -->
+    <script>
+        function swapDivsWithClick(div1,div2)
+        {
+            defaultCells = document.getElementsByClassName(div1);
+            editingCells = document.getElementsByClassName(div2);
+
+            buttonDiv = document.getElementById('submit-button')
+
+            for (var i=0; i<defaultCells.length; ++i){
+                        var D = defaultCells[i].style
+                        var E = editingCells[i].style
+
+                        console.log(D.display)
+
+                        
+
+                if( D.display !== "block")
+                {
+                    E.display = "none";
+                    D.display = "block";
+                }
+                else
+                {
+                    E.display = "block";
+                    D.display = "none";
+                }
+            }; // End of for loop
+
+            if (buttonDiv.style.display ==='none')
+            {
+                buttonDiv.style.display = 'block';
+            }
+            else
+            {
+                buttonDiv.style.display = 'none';
+            }
+
+        }
+        </script>
+
+
+
+    </script>
+    <button onclick="swapDivsWithClick('default-cell', 'editing-cell')">Editing</button>
+</div>
+
   
 {% endblock %}
-<script>
-    const julie = document.getElementById('currentCell');
-    if (julie) {
-        document.write('crap');
-    } else {
-        document.write('fuck');
-    }
-
-    julie.scrollIntoView();
-    document.write('BALLS')
-</script>
