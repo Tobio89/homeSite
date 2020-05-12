@@ -138,9 +138,16 @@ def index():
 
 @app.route('/schedule',  methods=['GET', 'POST'])
 def schedule():
+    
 
     scheduleString = Schedule.query.first().stringSchedule
+
+    if not scheduleString:
+        scheduleString = 'EEEEEEEETTTTTBEETTTEEETT'
+
     scheduleList = [letter for letter in scheduleString]
+
+    
 
     combined_schedule = []
     for i in range(len(timeList)):
@@ -155,6 +162,8 @@ def schedule():
     currentHour = datetime.now().hour
 
     if request.method == 'POST':
+
+        
         if 'submitEdit' in request.form:
             newSchedule = request.form.getlist('newSchedule')
             newSchedule_joined = ''.join(newSchedule)
@@ -431,7 +440,16 @@ def tasks():
 
         # Tasks that get to this else are recurring tasks. Their completed date is less important.
         else:
-            taskObject = recurringTask(name=task.name, createdDate=task.createdDate, interval=task.interval, delayedDays=task.delay, completedDate=task.completedDate)
+            completedDate = task.completedDate
+            if completedDate:
+                print(f'{task.name} has been completed before')
+                if task.completedDate < getTimelessDate(datetime.today()): #To reset completion if it's old, so that it shows up due next time.
+                    print('It was completed before today')
+                    completedDate = None
+                
+            
+            taskObject = recurringTask(name=task.name, createdDate=task.createdDate, interval=task.interval, delayedDays=task.delay, completedDate=completedDate)
+                    
             loadedTasks_taskObjects.append(taskObject)
 
 

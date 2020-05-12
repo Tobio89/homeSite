@@ -43,22 +43,64 @@
         {% endif %}
 {% endwith %}
 
+<div id="edit-button" style="padding-left: 1.1vw;">
+    
+    <script>
+        function swapDivsWithClick(div1,div2)
+        {
+            defaultCells = document.getElementsByClassName(div1);
+            editingCells = document.getElementsByClassName(div2);
 
+            buttonDiv = document.getElementById('submit-button')
+
+            for (var i=0; i<defaultCells.length; ++i){
+                        var D = defaultCells[i].style
+                        var E = editingCells[i].style
+
+                        console.log(D.display)
+
+                        
+
+                if( D.display !== "block")
+                {
+                    E.display = "none";
+                    D.display = "block";
+                }
+                else
+                {
+                    E.display = "block";
+                    D.display = "none";
+                }
+            }; // End of for loop
+
+            if (buttonDiv.style.display ==='none')
+            {
+                buttonDiv.style.display = 'block';
+            }
+            else
+            {
+                buttonDiv.style.display = 'none';
+            }
+
+        }
+        </script>
+
+
+
+    </script>
+    <button onclick="swapDivsWithClick('default-cell', 'editing-cell')">Editing</button>
+</div>
 
 
 <div class="container-fluid">
     <style>
-    .current{
-       /* border: 2px solid red; */
-       -webkit-box-shadow:inset 0px 0px 0px 4px #f00;
-       -moz-box-shadow:inset 0px 0px 0px 4px #f00;
-       box-shadow:inset 0px 0px 0px 4px #f00; 
-    }
+
     .person-E{
-        background-color: gold;
+        background-color:rgb(161, 114, 207);
+        
     }
     .person-T{
-        background-color: mediumslateblue;
+        background-color: rgb(89, 68, 209);
     }
 
     .person-B{
@@ -98,6 +140,10 @@
     .sched-heading{
         background: white;
     }
+    #current{
+        background-color:rgb(255, 255, 100);
+        font-weight: bolder;
+    }
     /* .sched-table:nth-child(even){
         background:lightgray; */
     .hide{
@@ -116,7 +162,7 @@
     }
     #submit-button{
         display: none;
-        padding:10px;
+        padding:0.8vw;
     }
     #edit-button{
         padding:10px;
@@ -145,12 +191,11 @@
         <div class="sched-column">
 
             {% if cell.hour == currentHour %}
-            <div class="sched-cell sched-heading current">
-                <div id='currentCell'>
-                    {{cell.hour}}:00
-                </div>
+            <div class="sched-cell sched-heading" id="current">
+                    
+                {{cell.hour}}:00
+            
             </div>
-
             {% else %}
             <div class="sched-cell sched-heading">
             
@@ -209,66 +254,7 @@
     <button type="submit" formmethod="post" name="submitEdit" >Submit New Schedule</button>
 </div>
 </form>
-<div id="edit-button">
-    <!-- <script>
-        function myFunction() {
 
-            var hiddenCells = document.getElementsByClassName('editing-cell');
-                for (var i=0; i<hiddenCells.length; ++i){
-
-                    var s = hiddenCells[i].style;
-                        s.display = s.display==='block' ? 'none' : 'block';
-                }; // End of for loop
-            } // End of function
-        
-        
-
-    </script> -->
-    <script>
-        function swapDivsWithClick(div1,div2)
-        {
-            defaultCells = document.getElementsByClassName(div1);
-            editingCells = document.getElementsByClassName(div2);
-
-            buttonDiv = document.getElementById('submit-button')
-
-            for (var i=0; i<defaultCells.length; ++i){
-                        var D = defaultCells[i].style
-                        var E = editingCells[i].style
-
-                        console.log(D.display)
-
-                        
-
-                if( D.display !== "block")
-                {
-                    E.display = "none";
-                    D.display = "block";
-                }
-                else
-                {
-                    E.display = "block";
-                    D.display = "none";
-                }
-            }; // End of for loop
-
-            if (buttonDiv.style.display ==='none')
-            {
-                buttonDiv.style.display = 'block';
-            }
-            else
-            {
-                buttonDiv.style.display = 'none';
-            }
-
-        }
-        </script>
-
-
-
-    </script>
-    <button onclick="swapDivsWithClick('default-cell', 'editing-cell')">Editing</button>
-</div>
 
   
 {% endblock %}
