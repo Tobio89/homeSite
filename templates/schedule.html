@@ -126,6 +126,9 @@
             justify-content: space-between;
             /* padding-bottom: 10px; */
             }
+    }
+    .highlighted {
+        background-color: chartreuse;
     } 
     </style>
  
@@ -152,14 +155,14 @@
             </div>
             
 
-            <div class="sched-cell default-cell person-{{cell.sched}}">
+            <div class="sched-cell sched-content default-cell person-{{cell.sched}}">
 
                 {{cell.sched}}
 
             </div>
 
             {% if cell.sched == 'E' %}
-            <div class="sched-cell editing-cell person-E">
+            <div class="sched-cell sched-content editing-cell person-E">
                 
                 
                 <select name="newSchedule">
@@ -171,7 +174,7 @@
                
         
             {% elif cell.sched == 'T' %}
-            <div class="sched-cell editing-cell person-T">
+            <div class="sched-cell sched-content editing-cell person-T">
             
                 <select name="newSchedule">
                     <option value="E">E</option>
@@ -182,7 +185,7 @@
             
             
             {% else %}
-            <div class="sched-cell editing-cell person-B"> 
+            <div class="sched-cell sched-content editing-cell person-B"> 
                 <select name="newSchedule">
                     <option value="E">E</option>
                     <option value="T">T</option>
@@ -242,6 +245,29 @@
         }
 
     }
+
+    // function scheduleCellChange() {
+    //     const table = document.querySelector('.sched-table');
+
+    //     function clickedCell(e) {
+    //         console.log(e.target);
+    //         e.target.classList.toggle('highlighted')
+    //     };
+
+    //     function getContents() {
+    //         const contents = document.querySelectorAll('.sched-table .default-cell');
+    //         for (i=0; i < contents.length; i++) {
+    //             let cell = contents[i].innerText
+    //             console.log(cell);
+    //         };
+    //     };
+
+    // table.addEventListener('click', getContents);
+
+    // };
+    // scheduleCellChange();
+
+    // https://stackoverflow.com/a/9084898
 </script>
   
 {% endblock %}
