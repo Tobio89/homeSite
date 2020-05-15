@@ -1,0 +1,43 @@
+{% extends "bootstrap/base.html" %}
+
+{% block title %}Our Home Site - {% endblock %}
+
+{% block navbar %}
+<div class="navbar navbar-inverse" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Home</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <!-- To make sick stuff like dropdowns here we can't use li -->
+                <!-- Alternatively put a sub menu on each page -->
+                <li><a href="/schedule">Robinschedule</a></li>
+                <li><a href="/shopping">Shopping List</a></li>
+                <li><a href="/shipping">Shipping Info</a></li>
+                <li><a href="/tasks">Tasks</a></li>
+            </ul>
+            
+        </div>
+        {% block subnav %}
+        {% endblock %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+{% block content %}
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{% endblock %}
+

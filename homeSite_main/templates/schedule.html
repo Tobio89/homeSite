@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+
+
+
+{% block title %}{{ super() }}Our Robinschedule{% endblock %}
+
+{% block content %}
+<div class="page-header" style="padding: 0 0 3vw 3vw;">
+    <h1>Who's looking after Robin now?</h1>  
+
+</div>
+
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="container">
+            {% for category, message in messages %}
+                <p>
+                
+                <div class="alert alert-{{category}}" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <strong>
+                        {% if category == 'info' %}
+                            Information:
+                        {% elif category == 'danger' %}
+                            ERROR:
+                        {% elif category == 'success' %}
+                            Success:
+                        {% else %}
+                            {{category}}
+                        {% endif %}
+                    </strong>
+                        
+                    <br>{{ message }}
+            {% endfor %}
+                
+                </div>
+                </p>
+        </div>
+        {% endif %}
+{% endwith %}
+
+<div id="edit-button" style="padding-left: 1.1vw;">
+    <button onclick="swapDivsWithClick('.default-cell', '.editing-cell')">Editing</button>
+</div>
+
+
+<div class="container-fluid">
+    <style>
+
+    .person-E{
+        background-color:rgb(161, 114, 207);
+        
+    }
+    .person-T{
+        background-color: rgb(89, 68, 209);
+    }
+
+    .person-B{
+        background-color: mediumseagreen;
+    }
+    td{
+        text-align:center
+    }
+    #currentCell{
+        font-weight:bolder;
+    }
+    .sched-table{
+        display: flex;
+        flex-direction: row;
+        flex-flow:wrap;
+        background: lightgrey;
+    }
+    .sched-column{
+        flex-grow: 1;
+        flex-basis:0px;
+        justify-content: stretch;
+        box-sizing: border-box;
+        padding: 0.1em;
+   
+
+    }
+    .sched-cell{
+        
+        align-items: flex-start;
+        border: 1px solid black;
+        text-align: center;
+    }
+    .sched-heading{
+        background: white;
+    }
+    #current{
+        box-shadow: 0px 0px 0px 3px rgb(95, 95, 95);
+        font-weight: bolder;
+        font-size: 1.05em;
+        
+    }
+
+    .hide{
+        height:0px;
+        opacity:0;
+    }
+    .show{
+        height:30px;
+        opacity:100;
+    }
+    .default-cell{
+        display: block;
+    }
+    .editing-cell{
+        display: none;
+    }
+    #submit-button{
+        display: none;
+        padding:0.8vw;
+    }
+    #edit-button{
+        padding:10px;
+    }
+
+    @media only screen and (max-width: 520px) {
+        .sched-column{
+            justify-content: space-between;
+            /* padding-bottom: 10px; */
+            }
+    }
+    .highlighted {
+        background-color: chartreuse;
+    } 
+    </style>
+ 
+<form method="POST">
+<div class="sched-table">
+    
+       
+    {% for cell in schedule %}
+
+        {% if cell.hour == currentHour %}
+
+        <div class="sched-column" id="current">
+
+        {% else %}
+
+        <div class="sched-column">
+        
+        {% endif %}
+            
+            <div class="sched-cell sched-heading">
+                    
+                {{cell.hour}}:00
+            
+            </div>
+            
+
+            <div class="sched-cell sched-content default-cell person-{{cell.sched}}">
+
+                {{cell.sched}}
+
+            </div>
+
+            {% if cell.sched == 'E' %}
+            <div class="sched-cell sched-content editing-cell person-E">
+                
+                
+                <select name="newSchedule">
+                    <option value="E" selected>E</option>
+                    <option value="T">T</option>
+                    <option value="B">B</option>
+                </select>
+            </div>
+               
+        
+            {% elif cell.sched == 'T' %}
+            <div class="sched-cell sched-content editing-cell person-T">
+            
+                <select name="newSchedule">
+                    <option value="E">E</option>
+                    <option value="T" selected>T</option>
+                    <option value="B">B</option>
+                </select>
+            </div>
+            
+            
+            {% else %}
+            <div class="sched-cell sched-content editing-cell person-B"> 
+                <select name="newSchedule">
+                    <option value="E">E</option>
+                    <option value="T">T</option>
+                    <option value="B" selected>B</option>
+                </select>
+            </div>      
+                {% endif %}
+            
+   
+
+        </div>
+    {% endfor %}
+    
+</div>
+
+<div id="submit-button">
+    <button type="submit" formmethod="post" name="submitEdit" >Submit New Schedule</button>
+</div>
+</form>
+
+
+<script>
+    function swapDivsWithClick(div1,div2)
+    {
+        defaultCells = document.querySelectorAll(div1);
+        editingCells = document.querySelectorAll(div2);
+
+        buttonDiv = document.querySelector('#submit-button')
+
+        for (var i=0; i<defaultCells.length; ++i){
+                    var D = defaultCells[i].style
+                    var E = editingCells[i].style
+
+                    console.log(D.display)
+
+                    
+
+            if( D.display !== "block")
+            {
+                E.display = "none";
+                D.display = "block";
+            }
+            else
+            {
+                E.display = "block";
+                D.display = "none";
+            }
+        }; // End of for loop
+
+        if (buttonDiv.style.display ==='none')
+        {
+            buttonDiv.style.display = 'block';
+        }
+        else
+        {
+            buttonDiv.style.display = 'none';
+        }
+
+    }
+
+    // function scheduleCellChange() {
+    //     const table = document.querySelector('.sched-table');
+
+    //     function clickedCell(e) {
+    //         console.log(e.target);
+    //         e.target.classList.toggle('highlighted')
+    //     };
+
+    //     function getContents() {
+    //         const contents = document.querySelectorAll('.sched-table .default-cell');
+    //         for (i=0; i < contents.length; i++) {
+    //             let cell = contents[i].innerText
+    //             console.log(cell);
+    //         };
+    //     };
+
+    // table.addEventListener('click', getContents);
+
+    // };
+    // scheduleCellChange();
+
+    // https://stackoverflow.com/a/9084898
+</script>
+  
+{% endblock %}

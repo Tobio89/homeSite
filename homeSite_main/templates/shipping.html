@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}{{ super() }}Shipping{% endblock %}
+
+{% block content %}
+<div class="page-header" style="padding-left: 50px;">
+    <h1>Parcel Tracking</h1>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="container">
+            {% for category, message in messages %}
+                <p>
+                
+                <div class="alert alert-{{category}}" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <strong>
+                        {% if category == 'info' %}
+                            Information:
+                        {% elif category == 'danger' %}
+                            ERROR:
+                        {% elif category == 'success' %}
+                            Success:
+                        {% else %}
+                            {{category}}
+                        {% endif %}
+                    </strong>
+                        
+                    <br>{{ message }}</br>
+            {% endfor %}
+                
+                </div>
+                </p>
+        </div>
+        {% endif %}
+{% endwith %}
+
+
+<div class="container">
+    <table class="table">
+
+        <style> /* Responsiveness for the parcel tracking table */
+
+            @media only screen and (max-width: 768px) {
+                #extra                  		{ display:none; visibility:hidden; }
+            }
+
+
+            @media only screen and (max-width: 680px) {
+                #company	                    { display:none; visibility:hidden; }
+                #extra                  		{ display:none; visibility:hidden; }
+
+            }
+
+            @media only screen and (max-width: 520px) {
+                #company                     	{ display:none; visibility:hidden; }
+                #trackingNumber                 { display:none; visibility:hidden; }
+                #location                       { display:none; visibility:hidden; }
+                #extra                          { display:none; visibility:hidden; }
+
+                #item {width:40%}
+                #timestamp {width:30px}
+                #status {width:25%}
+                #selection {width:5%}
+
+            }
+
+        </style>
+            
+        <th id="item">Item:</th>
+        <th id="company">Company:</th>
+        <th id="trackingNumber">Tracking Number:</th>
+        <th id="timestamp">Timestamp:</th>
+        <th id="status" style="width:10%">Status:</th>
+        <th id="location">Location:</th>
+        <th id="extra" style="width: 30%;">Extra:</th>
+        <th id="selection"></th>
+
+        {% if parcels %}
+
+
+            <form method="POST"><!--Form to control fetching parcel results-->
+        
+                {% for parcel in parcels %}
+                    {% if parcel.delivered %}
+                        <tr style="background-color: mediumspringgreen;">
+                    {% else %}
+                        <tr>
+                    {% endif %}
+                            <td id="item">{{parcel.description}}</td>
+                            <td id="company">{{parcel.company}}</td>
+                            <td id="trackingNumber">{{parcel.trackingNumber}}</td>
+                            <td id="timestamp">{{parcel.timestamp}}</td>
+                            <td id="status">{{parcel.status}}</td>
+                            <td id="location">{{parcel.location}}</td>
+                            <td id="extra">{{parcel.extraNotes}}</td>
+                            <td id="selection"><input type="radio" name="parcelToUpdate" value="{{parcel.id}}"></td>
+                        </tr>  
+                {% endfor %}
+            
+
+        </table>
+
+            <input type="submit" name="update" value="Update Tracking Information">
+            <input type="submit" name="remove" value="Remove Parcel">
+            </form>
+        
+        {% else %}
+
+        </table>
+        <div class="container" style="text-align: center;">
+            No parcels registered.
+        </div>
+        {% endif %}
+<br/>
+<br/>
+</div>
+
+<div class="container" style="border: 1px solid black; padding: 10px;">
+    <style>
+        td{
+            padding:5px
+        }
+    </style>
+    
+    <form method=POST name="addParcelInfo"> <!-- Form for selecting the parcel provider -->
+        <table>
+            <tr>
+                <th colspan="2">
+                    <h4>Add Parcels:</h4>
+                </th>
+            </tr>
+            <tr>
+                <td>
+                    <label for="selectedParcelProvider">Delivery Company:</label>    
+                </td>
+
+                <td>
+                    <select id="selectedParcelProvider" name="selectedParcelProvider">
+                        {% for company in companies %}
+                            <option value="{{company}}">{{company}}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="parcelNumber">Parcel Number:</label>
+                </td>
+                <td>
+                    <input type="text" id="parcelNumber" name="parcelNumber" required>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="parcelDescription">Description:</label>
+                </td>
+                <td> 
+                    <input type="text" id="parcelDescription" name="parcelDescription" required>
+                </td>
+            </tr>
+            <tr style="height: 20px;">
+                <!-- blank -->
+            </tr>
+        </table>
+    <input type="submit" name="addParcelInfo">
+    </form>
+</div>
+<br>
+<br>
+
+{% endblock %}

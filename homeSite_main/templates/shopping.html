@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}{{ super() }}What to buy{% endblock %}
+
+
+{% block content %}
+<div class="page-header" style="padding-left: 50px;">
+    <h1>You need to buy:</h1>
+</div>
+{% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="container">
+            {% for category, message in messages %}
+                <p>
+                
+                <div class="alert alert-{{category}}" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <strong>
+                        {% if category == 'info' %}
+                            Information:
+                        {% elif category == 'danger' %}
+                            ERROR:
+                        {% elif category == 'success' %}
+                            Success:
+                        {% else %}
+                            {{category}}
+                        {% endif %}
+                    </strong>
+                        
+                    <br>{{ message }}
+            {% endfor %}
+                
+                </div>
+                </p>
+        </div>
+        {% endif %}
+{% endwith %}
+
+<div class="container">
+    {% if items %}
+    <form method="POST" name="itemsToRemove">
+    <table>
+        <tr>
+            <th style="width: 90%;">
+                Item
+            </th>
+            <th style="width: 10%;">
+                
+            </th>
+        </tr>
+        {% for item in items %}
+            <tr>
+                <td>
+                    {{item.itemName}}
+                </td>
+                <td>
+                    {% if item.quantity %}
+                    {{item.quantity}}
+                    {% endif %}
+                </td>
+                <td><input type="checkbox" name="itemToRemove" value="{{item.itemName}}"></td>
+            </tr>
+        {% endfor %}
+    </table>
+    <br/>
+    <input type="submit" name="remove" value="Remove Item">
+</form>
+    <br/>
+    <form method="POST">
+        
+        <input type="submit" name="eileen" value="Send List to Eileen">
+        <input type="submit" name="toby" value="Send List to Toby">
+
+    </form> 
+    {% else %}
+        <div class="list-group-heading" style="padding-left: 50px;">
+            There's nothing you need to buy.
+        </div>
+    {% endif %}
+
+    
+</div>
+<br>
+<br>
+<div class="container" style="border: 1px solid black; padding: 10px;">
+    <style>
+        td{
+            padding:5px
+        }
+    </style>
+    
+    <form method=POST name="addItem"> <!-- Form for selecting the parcel provider -->
+        <table>
+            <tr>
+                <th colspan="2">
+                    <h4>Add Items:</h4>
+                </th>
+            </tr>
+            <tr>
+                <td>
+                    <label for="itemName">Item Name:</label>    
+                </td>
+
+                <td>
+                    <input type="text" id="itemName" name="itemName" required>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="itemQuant">Quantity:</label>
+                </td>
+                <td>
+                    <input type="number" id="itemQuant" name="itemQuant" min='1'>
+                </td>
+            </tr>
+            <tr style="height: 20px;">
+                <!-- blank -->
+            </tr>
+        </table>
+    <input type="submit" name="addItem" value="Add Item">
+    </form>
+</div>
+<br/>
+{% endblock %}
