@@ -52,8 +52,9 @@ def schedule():
 
         
         if 'submitEdit' in request.form:
-            newSchedule = request.form.getlist('newSchedule')
-            newSchedule_joined = ''.join(newSchedule)
+            # print(request.form)
+            # newSchedule = request.form.getlist('newSchedule')
+            newSchedule_joined = request.form.get('submitEdit')
             print(newSchedule_joined)
 
             if newSchedule_joined == scheduleString:
