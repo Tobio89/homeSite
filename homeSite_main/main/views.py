@@ -3,7 +3,6 @@ from flask import Flask, render_template, session, redirect, url_for, request, f
 from .. import db
 from ..models import Grocery, Schedule, ParcelInfo, Tasks
 from ..email import send_email
-from ..wisdom import getWisdom
 from . import main
 from ..parcelChecker import getCJParcelStatus, getHanJinParcelStatus, getLotteParcelStatus
 from ..tasks import recurringTask, oneTimeTask, getTimelessDate
@@ -20,8 +19,7 @@ parcelProviders = ['CJ', 'Lotte', 'HanJin']
 
 @main.route('/')
 def index():
-    content = getWisdom()
-    return render_template('index.html', textContent=content)
+    return render_template('index.html')
 
 @main.route('/schedule',  methods=['GET', 'POST'])
 def schedule():
