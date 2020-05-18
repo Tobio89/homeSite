@@ -25,9 +25,10 @@ def index():
 def schedule():
     
 
-    scheduleString = Schedule.query.first().stringSchedule
-
-    if not scheduleString:
+    scheduleValue = Schedule.query.first()
+    if scheduleValue:
+        scheduleString = scheduleValue.stringSchedule
+    else:
         scheduleString = 'EEEEEEEETTTTTBEETTTEEETT'
 
     scheduleList = [letter for letter in scheduleString]
