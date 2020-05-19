@@ -33,6 +33,10 @@ def schedule():
 
     scheduleList = [letter for letter in scheduleString]
 
+    scheduleCounts = {
+        'E': (scheduleList.count('E') + scheduleList.count('B')),
+        'T': (scheduleList.count('T') + scheduleList.count('B')),
+    }
     
 
     combined_schedule = []
@@ -73,7 +77,7 @@ def schedule():
 
     
    
-    return render_template('schedule.html', schedule=combined_schedule, currentHour=str(currentHour))
+    return render_template('schedule.html', schedule=combined_schedule, currentHour=str(currentHour), counts=scheduleCounts)
 
 @main.route('/schedule/edit', methods=['GET', 'POST'])
 def editSchedule():

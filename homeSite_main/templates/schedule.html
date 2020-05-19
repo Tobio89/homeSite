@@ -53,10 +53,14 @@
     }
     .person-T{
         background-color: rgb(89, 68, 209);
+        color:lightgray;
     }
 
     .person-B{
         background-color: mediumseagreen;
+    }
+    .person-N{
+        background-color: blanchedalmond;
     }
     td{
         text-align:center
@@ -93,6 +97,28 @@
         font-weight: bolder;
         font-size: 1.05em;
         
+    }
+    .editRow{
+        display:flex;
+        align-items: center;
+        /* justify-content: center; */
+        height: 70px;
+    }
+    .countCell{
+
+        text-align: center;
+        vertical-align: middle;
+        height: 100%;
+        padding: 5px;
+        margin: 5px;
+        font-weight: bold; 
+    }
+    #countEileen{
+        background: rgb(161, 114, 207);
+    }
+    #countToby{
+        background-color: rgb(89, 68, 209);
+        color: lightgray;
     }
 
     .hide{
@@ -162,15 +188,18 @@
     
 </div>
 </form>
-
+<div class='editRow'>
 <div id="edit-button" style="padding-left: 1.1vw;">
     <button id="editing" onclick="toggleEditing()">Edit Schedule</button>
 </div>
-
+<div class='countCell hide' id='countEileen'>Eileen: {{counts['E'] }}</div>
+<div class='countCell hide' id='countToby'>Toby: {{ counts['T'] }}</div>
+</div>
 
 <form name="JSSchedule" method='POST'  onsubmit="return getScheduleFromCells();">
 <div class="hide" id="submit-button">
     <button id="submitSchedule" type="submit" formmethod="post" name="submitEdit">Submit New Schedule</button>
+
 </div>
 </form>
 
@@ -194,6 +223,15 @@
         } else if (submitBtn.classList.contains('show')){
             submitBtn.classList.replace('show', 'hide')
         };
+        let countingCells = document.querySelectorAll('.countCell')
+        if ( countingCells[0].classList.contains('hide')){
+            countingCells[0].classList.replace('hide', 'show')
+            countingCells[1].classList.replace('hide', 'show')
+        } else if (countingCells[0].classList.contains('show')){
+            countingCells[0].classList.replace('show', 'hide')
+            countingCells[1].classList.replace('show', 'hide')
+        };
+
 
         
     };
@@ -233,11 +271,41 @@
                     e.target.innerText = 'B';
                 }
                 else if (e.target.innerText.search('B') !== -1){
+                    e.target.classList = ('sched-cell sched-content default-cell person-N')
+                    e.target.innerText = 'N';
+                }
+                else if (e.target.innerText.search('N') !== -1){
                     e.target.classList = ('sched-cell sched-content default-cell person-E')
                     e.target.innerText = 'E';
                 };
+
             };
-        };
+
+            const contentCells = document.querySelectorAll('.sched-content')
+            var Ecount = 0
+            var Tcount = 0
+            for (i=0; i < contentCells.length; i++) {
+                let cell = contentCells[i].innerHTML
+                
+                if (cell.search('E')!== -1){
+                    Ecount++
+                } else if (cell.search('T') !==-1){
+                    Tcount++
+                } else if (cell.search('B') !== -1){
+                    Ecount++
+                    Tcount++
+                };
+            };
+
+            const EileenCountCell = document.querySelector('#countEileen')
+                EileenCountCell.innerHTML = 'Eileen: ' + Ecount
+            
+            const TobyCountCell = document.querySelector('#countToby')
+                TobyCountCell.innerHTML = 'Toby: ' + Tcount
+            };
+
+        
+        
 
         
 
