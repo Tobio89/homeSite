@@ -218,10 +218,12 @@ def getHanJinParcelStatus(parcelNumber):
         return resultsDict
 
     resultsTable_rows = resultsTable_entire.findAll('tr')
-
-    finalResultRow = resultsTable_rows[-2] # Row -1 tells about who receives but not the status of the parcel.
-
+    
+    finalResultRow = resultsTable_rows[-1] #Takes the bottom row if the table is not completed
     resultCells = finalResultRow.findAll('td')
+    if len(resultCells) <= 1: #Covers the weird bottom row if the delivery was completed
+        finalResultRow = resultsTable_rows[-2]
+        resultCells = finalResultRow.findAll('td')
 
     results = [cell.get_text() for cell in resultCells]
 
@@ -283,6 +285,8 @@ if __name__ == "__main__":
 
     # print(getLotteParcelStatus(oddNumber))
 
-    # print(getHanJinParcelStatus(HanJinParcelNumber))
-
     # print(getHanJinParcelStatus(HanJinMidNumber))
+
+    # print(getHanJinParcelStatus('507908537054'))
+
+    
